@@ -201,10 +201,9 @@ const angDiff=(a,b)=>{let d=b-a;while(d>Math.PI)d-=Math.PI*2;while(d<-Math.PI)d+
 
 /* ---------- renderer / scene ---------- */
 const IS_TOUCH=matchMedia("(pointer:coarse)").matches||(("ontouchstart" in window)&&navigator.maxTouchPoints>0);
-if(IS_TOUCH){THREE.MeshStandardMaterial=function(p){p=Object.assign({},p||{});delete p.roughness;delete p.metalness;p.shininess=6;p.specular=new THREE.Color(0x1a1a1a);return new THREE.MeshPhongMaterial(p);};}
-const renderer=new THREE.WebGLRenderer({canvas:$('c'),antialias:!IS_TOUCH,powerPreference:'high-performance'});
-const baseRatio=Math.min(devicePixelRatio,IS_TOUCH?1.25:1.75);let resScale=1;
-renderer.shadowMap.enabled=!IS_TOUCH;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+const renderer=new THREE.WebGLRenderer({canvas:$('c'),antialias:true,powerPreference:'high-performance'});
+const baseRatio=Math.min(devicePixelRatio,IS_TOUCH?1.5:1.75);let resScale=1;
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 const scene=new THREE.Scene();
 scene.background=new THREE.Color(0x78b8ee);
 scene.fog=new THREE.Fog(0x78b8ee,70,230);
@@ -213,7 +212,7 @@ function resize(){renderer.setPixelRatio(baseRatio*resScale);renderer.setSize(in
 addEventListener('resize',resize);resize();
 
 const hemi=new THREE.HemisphereLight(0xbcd8ff,0x2a3a30,.6);scene.add(hemi);
-const sun=new THREE.DirectionalLight(0xffffff,1);sun.castShadow=!IS_TOUCH;
+const sun=new THREE.DirectionalLight(0xffffff,1);sun.castShadow=true;
 sun.shadow.mapSize.set(IS_TOUCH?1024:2048,IS_TOUCH?1024:2048);
 Object.assign(sun.shadow.camera,{left:-28,right:28,top:28,bottom:-28,near:1,far:200});
 sun.shadow.bias=-.0006;sun.shadow.normalBias=.03;
@@ -515,8 +514,8 @@ for(let i=0;i<8;i++)box(.2,.1,.32,mat(0x2a2a2a),72+i*.34,.06,-2+Math.sin(i)*.12)
 
 await __stage(78,'Güverte');
 /* ---------- sea ---------- */
-const SEG=IS_TOUCH?40:70;const seaGeo=new THREE.PlaneGeometry(340,340,SEG,SEG);seaGeo.rotateX(-Math.PI/2);
-const seaMat=new THREE.MeshPhongMaterial({color:0x1f5f8b,shininess:40,flatShading:true});
+const SEG=IS_TOUCH?56:70;const seaGeo=new THREE.PlaneGeometry(340,340,SEG,SEG);seaGeo.rotateX(-Math.PI/2);
+const seaMat=new THREE.MeshStandardMaterial({color:0x1f5f8b,roughness:.45,metalness:.15,flatShading:true});
 const sea=new THREE.Mesh(seaGeo,seaMat);sea.position.set(20,-2.6,-2);sea.receiveShadow=true;scene.add(sea);
 const seaPos=seaGeo.attributes.position;
 let seaF=0;function animSea(t){if(IS_TOUCH&&(seaF++&1))return;const a=seaPos.array;for(let i=0;i<seaPos.count;i++){const x=a[i*3]+20,z=a[i*3+2]-2;a[i*3+1]=.26*Math.sin(.33*(x+t*5))+.2*Math.sin(.27*z-t*.9+x*.08)+.1*Math.sin(.9*(x+z+t*6)+1);}seaPos.needsUpdate=true;}
@@ -1146,7 +1145,7 @@ function worldUpdate(dt,t){
   if(AC&&engG){const inside=inInterior();engG.gain.value=lerp(engG.gain.value,inside?.18:.08,dt*2);waveG.gain.value=lerp(waveG.gain.value,inside?.1:.28,dt*2);}
   // sky + camera
   const h=G.min/60;player.getWorldPosition(wp);
-  sunMul=lerp(sunMul,(IS_TOUCH&&inInterior())?.2:1,Math.min(1,dt*3));updateSky(h,wp);
+  sunMul=lerp(sunMul,1,Math.min(1,dt*3));updateSky(h,wp);
   const inside=inInterior();camDist=lerp(camDist,zoomBase*(inside?.82:1),dt*2.5);
   camTgt.lerp(wp,Math.min(1,dt*5));
   const sh=MG.shake>0?MG.shake*.2:0;
@@ -1155,7 +1154,7 @@ function worldUpdate(dt,t){
   camera.lookAt(camTgt.x,camTgt.y+.9,camTgt.z-.6+(MG.active?(IS_TOUCH?3.4:1.6):0));
 }
 
-const POOL=[];for(let i=0;i<(IS_TOUCH?3:4);i++){const l=new THREE.PointLight(0xffffff,0,12,1.4);ship.add(l);POOL.push({l:l,def:null,k:0});}
+const POOL=[];for(let i=0;i<4;i++){const l=new THREE.PointLight(0xffffff,0,12,1.4);ship.add(l);POOL.push({l:l,def:null,k:0});}
 let poolT=0;
 function updateLamps(dt){
   poolT-=dt;
@@ -1178,8 +1177,8 @@ function loop(now){
   fpsT+=raw;fpsN++;
   if(fpsT>=1.5){const fps=fpsN/fpsT;fpsT=0;fpsN=0;
     if(fpsWarm>0)fpsWarm--;
-    else if(fps<42&&resScale>.5){resScale=Math.max(.5,resScale*.85);resize();}
-    else if(fps>57&&resScale<1){resScale=Math.min(1,resScale*1.1);resize();}}
+    else if(fps<30&&resScale>.75){resScale=Math.max(.75,resScale*.9);resize();}
+    else if(fps>50&&resScale<1){resScale=Math.min(1,resScale*1.1);resize();}}
   if(G.state==='play')gameUpdate(dt);
   animatePlayer(dt,time);
   worldUpdate(dt,time);
