@@ -834,15 +834,17 @@ const PADS={mash:[['◄','KeyA'],['►','KeyD']],helm:[['◄','KeyA'],['►','Ke
 function buildPad(kind){
   const p=$('pad');p.innerHTML='';if(!IS_TOUCH)return;
   (PADS[kind]||[]).forEach(([lab,code])=>{const b=document.createElement('button');b.className='pb';b.textContent=lab;
-    b.addEventListener('pointerdown',e=>{e.preventDefault();keys.add(code);if(MG.active)miniKey({code});});
+    b.addEventListener('pointerdown',e=>{e.preventDefault();keys.add(code);if(MG.active)miniKey({code});
+      const rel=()=>{keys.delete(code);removeEventListener('pointerup',rel);removeEventListener('pointercancel',rel);};
+      addEventListener('pointerup',rel);addEventListener('pointercancel',rel);});
     ['pointerup','pointercancel','pointerleave'].forEach(n=>b.addEventListener(n,()=>keys.delete(code)));p.appendChild(b);});
 }
 function startMini(task){if(joy.active||runHeld)resetJoy();
   MG.active=true;MG.task=task;MG.kind=task.kind;MG.t=0;MG.prog=0;MG.flash=0;MG.shake=0;MG.d={};MG.curseT=rand(1.5,3);
-  buildPad(task.kind);$('mini').classList.remove('hidden');$('miniT').textContent=task.title;$('miniH').textContent=task.help;
+  if(IS_TOUCH)keys.clear();buildPad(task.kind);$('mini').classList.remove('hidden');$('miniT').textContent=task.title;$('miniH').textContent=task.help;
   MINI[task.kind].init();Object.entries(P.props).forEach(([k,p])=>p.visible=k===task.prop);
 }
-function endMini(){$('pad').innerHTML='';MG.active=false;$('mini').classList.add('hidden');Object.values(P.props).forEach(p=>p.visible=false);}
+function endMini(){$('pad').innerHTML='';if(IS_TOUCH){keys.clear();runHeld=false;if(typeof resetJoy==='function')resetJoy();}MG.active=false;$('mini').classList.add('hidden');Object.values(P.props).forEach(p=>p.visible=false);}
 function abortMini(){const wasMeal=MG.task&&MG.task.meal;endMini();if(!wasMeal)G.phase='toTask';say('Bırak ya, bir nefes alayım...',2.2,'thought');}
 function miniKey(e){const m=MINI[MG.kind];m.key&&m.key(e);}
 mc.addEventListener('pointerdown',e=>{if(!MG.active)return;const r=mc.getBoundingClientRect(),x=(e.clientX-r.left)*MW/r.width,y=(e.clientY-r.top)*MH/r.height;const m=MINI[MG.kind];m.click&&m.click(x,y);});
