@@ -116,6 +116,20 @@ body.touch #mbar{height:6px;margin-top:5px}
 body.touch #pad{margin-top:5px;gap:6px}body.touch .pb{height:42px;font-size:16px}
 body.touch #mini small{font-size:9px;margin-top:3px}
 @media (pointer:coarse){.overlay h1{font-size:34px}.overlay p{font-size:12px}.overlay button{padding:10px 26px;font-size:15px;min-height:44px}.keys{font-size:10px}.overlay h2{font-size:24px}#deStats{font-size:13px}}
+#taskM{white-space:pre-line}
+.overlay .linkbtn{background:none;color:#8d9a8f;text-decoration:underline;font-size:12px;letter-spacing:.06em;margin-top:8px;padding:6px 10px;min-height:0;font-weight:400}
+#changelog{justify-content:flex-start;align-items:center}
+#clBody{max-width:640px;width:100%;text-align:left;font-size:14px;line-height:1.5;color:#cfcab4}
+#clBody h3{color:var(--amber);font-size:14px;letter-spacing:.1em;margin:16px 0 4px}
+#clBody ul{margin:0;padding-left:18px}#clBody li{margin:2px 0}
+#dlg{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);width:min(560px,94vw);z-index:8}
+#dlgName{color:var(--amber);font-weight:700;letter-spacing:.1em;font-size:12px;margin-bottom:4px}
+#dlgText{font-size:15px;line-height:1.4;margin-bottom:8px}
+#dlgOpts button{display:block;width:100%;text-align:left;margin-top:6px;font:inherit;font-size:14px;padding:10px 12px;background:#202c26;color:#e9e4d2;border:1px solid var(--line);border-radius:6px;cursor:pointer;touch-action:manipulation}
+#dlgOpts button:hover{background:#2c3b33}
+body.touch #dlg{bottom:calc(8px + env(safe-area-inset-bottom));padding:7px 9px}
+body.touch #dlgText{font-size:12px;margin-bottom:4px}body.touch #dlgName{font-size:10px}
+body.touch #dlgOpts button{font-size:12px;padding:8px 10px;margin-top:4px}
 </style>
 </head>
 <body>
@@ -150,12 +164,22 @@ body.touch #mini small{font-size:9px;margin-top:3px}
   <p>Gemideki en küçük rütbe, en uzun mesai. Sabah 06:00'da kalkıp gece 24:00'e kadar temizlik, evrak, pas, dümen, palamar…<br>Görev biter, kamaraya gidersin. Tam yatarken telsiz çalar.</p>
   <p style="color:#8d9a8f;font-size:13px">Dinlenmek yok. Küfür serbest.</p>
   <p style="color:#8d9a8f;font-size:13px">Bugünün menüsü: balık. Yarınki menü: balık.</p>
+  <button id="contBtn" class="hidden">DEVAM ET</button>
   <button id="startBtn">VARDİYAYA BAŞLA</button>
+  <button id="logBtn" class="linkbtn">Güncelleme günlüğü</button>
   <noscript><p style="color:#e07060">JavaScript kapalı, oyun çalışmaz.</p></noscript>
   <div style="width:240px;height:6px;background:#1b2420;border-radius:3px;margin-top:12px;overflow:hidden"><i id="bootbar" style="display:block;height:100%;width:0;background:#f3b84b;transition:width .2s"></i></div>
   <div id="bootmsg" style="margin-top:10px;font-size:12px;color:#8d9a8f;max-width:340px">Sayfa açıldı, JavaScript bekleniyor…</div>
-  <div class="keys"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> yürü &nbsp; <kbd>SHIFT</kbd> koş &nbsp; <kbd>E</kbd> etkileşim &nbsp; <kbd>ESC</kbd> işi bırak &nbsp; <kbd>M</kbd> ses<br>Mobil: sol joystick, sağda E ve KOŞ, iki parmakla yakınlaştır</div>
+  <div class="keys"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> yürü &nbsp; <kbd>SHIFT</kbd> koş &nbsp; <kbd>E</kbd> etkileşim &nbsp; <kbd>ESC</kbd> işi bırak &nbsp; <kbd>M</kbd> ses<br>Mobil: ekranın alt kısmında parmağını sürükle (joystick), sağda E ve KOŞ</div>
 </div>
+
+<div id="changelog" class="overlay hidden">
+  <h2>GÜNCELLEME GÜNLÜĞÜ</h2>
+  <div id="clBody"></div>
+  <button id="clClose">KAPAT</button>
+</div>
+
+<div id="dlg" class="panel hidden"><div id="dlgName"></div><div id="dlgText"></div><div id="dlgOpts"></div></div>
 
 <div id="dayend" class="overlay hidden">
   <h2 id="deT">GÜN SONU · 24:00</h2>
@@ -174,6 +198,7 @@ body.touch #mini small{font-size:9px;margin-top:3px}
 <script>(function(){var m=document.getElementById("bootmsg"),b=document.getElementById("startBtn");m.textContent="1/3 ✓ JavaScript çalışıyor, oyun kodu bekleniyor…";
 try{var c=document.createElement("canvas");if(!(c.getContext("webgl")||c.getContext("experimental-webgl")))m.textContent="Bu tarayıcıda WebGL kapalı ya da desteklenmiyor. Safari veya Chrome ile açmayı dene.";}catch(e){m.textContent="WebGL kontrolü hata verdi: "+e.message;}
 setTimeout(function(){if(!window.__start){m.textContent="Yükleme takıldı. Son aşama: "+(window.__stageName||"başlamadı")+". Kırmızı şerit varsa onu da yaz.";}},20000);
+var cb=document.getElementById("contBtn");cb.addEventListener("click",function(){if(window.__continue)window.__continue();});
 b.addEventListener("click",function(){if(window.__start)window.__start();else m.textContent="Oyun kodu çalışmadı. Alttaki kırmızı hata şeridini yaz bana (yoksa sayfa JavaScript'i engelliyor).";});})();</script>
 <script>addEventListener("error",function(e){var d=document.getElementById("err");d.style.display="block";d.textContent+=(e.message||"hata")+" @"+(e.lineno||"")+"\n";});</script>
 <script>/**
@@ -388,6 +413,8 @@ await __stage(46,'Kamara');
 await __stage(54,'Ofis');
 /* MESS HALL + GALLEY (hep balık) */
 const FISH=['Balık çorbası','Izgara balık','Balık köfte','Balıklı pilav','Balık tava','Balık yahni','Hamsi buğulama','Balık güveç','Konserve balık','Balıklı omlet'];
+const NOFISH=['Kuru fasulye','Pilav üstü tavuk','Mercimek çorbası','Makarna'];
+const MENUREF={tex:null,plates:[]};
 function fishMesh(sc=1,col=0x9fb0b8){
   const g=new THREE.Group();
   const b=new THREE.Mesh(new THREE.SphereGeometry(1,10,8),mat(col,{metalness:.4,roughness:.4}));b.scale.set(.32*sc,.1*sc,.13*sc);b.castShadow=true;g.add(b);
@@ -410,6 +437,9 @@ function makeCrew(o){
   if(o.mustache){const m=new THREE.Mesh(new THREE.BoxGeometry(.22,.05,.06),mat(0x2a2220,{metalness:0}));m.position.set(0,-.06,.25);head.add(m);}
   if(o.hat==='cook'){const h1=new THREE.Mesh(new THREE.CylinderGeometry(.2,.22,.4,12),mat(0xf4f2ea,{metalness:0}));h1.position.y=.4;add(h1,head);const h2=new THREE.Mesh(new THREE.SphereGeometry(.25,10,8),mat(0xf4f2ea,{metalness:0}));h2.position.y=.62;h2.scale.y=.6;head.add(h2);}
   if(o.hat==='cap'){const c=new THREE.Mesh(new THREE.CylinderGeometry(.27,.29,.16,14),mat(0xf0f0f0,{metalness:0}));c.position.y=.25;add(c,head);const br=new THREE.Mesh(new THREE.BoxGeometry(.3,.03,.18),mat(0x111418));br.position.set(0,.2,.25);head.add(br);}
+  if(o.hat==='hard'){const h1=new THREE.Mesh(new THREE.SphereGeometry(.27,12,8,0,Math.PI*2,0,Math.PI*.55),mat(0xf2c400,{metalness:0}));h1.position.y=.08;add(h1,head);}
+  if(o.hat==='beanie'){const h1=new THREE.Mesh(new THREE.SphereGeometry(.275,12,8,0,Math.PI*2,0,Math.PI*.5),mat(0x1f2a35,{metalness:0}));h1.position.y=.06;add(h1,head);}
+  if(o.glasses){for(const gs of[-1,1]){const gl=new THREE.Mesh(new THREE.TorusGeometry(.06,.01,6,12),mat(0x111111));gl.position.set(gs*.1,.04,.245);head.add(gl);}}
   if(o.apron){const ap=new THREE.Mesh(new THREE.BoxGeometry(.4,.55,.06),mat(0xeeeeee,{metalness:0}));ap.position.set(0,1.05,.24);add(ap,g);}
   g.scale.setScalar(.95);ship.add(g);return{g,head};
 }
@@ -421,9 +451,9 @@ const EAT={x:-29.2,z:-6.15};
   box(4.6,.9,1.2,mat(0x7a5a3a),-29.2,.45,-4.3);box(4.7,.07,1.3,mat(0x9a7a52),-29.2,.92,-4.3);
   box(4.6,.5,.4,mat(0x4a3a2c),-29.2,.25,-5.3);box(4.6,.5,.4,mat(0x4a3a2c),-29.2,.25,-3.3);
   addBlock(-31.6,-26.8,-5.6,-3.0);
-  [-30.5,-29.2,-27.9].forEach(x=>{cyl(.28,.28,.03,white,x,.96,-4.3,ship,16);const f=fishMesh(1);f.position.set(x,1.03,-4.3);ship.add(f);});
+  [-30.5,-29.2,-27.9].forEach(x=>{cyl(.28,.28,.03,white,x,.96,-4.3,ship,16);const f=fishMesh(1);f.position.set(x,1.03,-4.3);ship.add(f);MENUREF.plates.push(f);});
   const menu=ctex(256,128,(g,w,h)=>{g.fillStyle='#1d2a24';g.fillRect(0,0,w,h);g.fillStyle='#e9e4d2';g.font='bold 22px Arial';g.textAlign='center';g.fillText('BUGÜNÜN MENÜSÜ',w/2,32);g.font='bold 34px Arial';g.fillStyle='#f3b84b';g.fillText('BALIK',w/2,72);g.font='14px Arial';g.fillStyle='#b9b49c';g.fillText('yarın: balık · öbür gün: balık',w/2,102);});
-  const mb=new THREE.Mesh(new THREE.PlaneGeometry(2.4,1.2),new THREE.MeshStandardMaterial({map:menu,roughness:.9}));mb.position.set(-27.3,2.1,-6.94);ship.add(mb);
+  const mb=new THREE.Mesh(new THREE.PlaneGeometry(2.4,1.2),new THREE.MeshStandardMaterial({map:menu,roughness:.9}));mb.position.set(-27.3,2.1,-6.94);ship.add(mb);MENUREF.tex=menu;
   const ln=cyl(.01,.01,3.4,mat(0x6b5a3f),-31.0,2.95,-6.7,ship,4);ln.rotation.z=Math.PI/2;
   for(let i=0;i<4;i++){const f=fishMesh(.8,0x8a9ba3);f.rotation.z=Math.PI/2;f.position.set(-32.2+i*.8,2.55,-6.7);ship.add(f);}
   lampFixture(-29.2,2.8,-5.8,true,0xfff0c8,.95,11);
@@ -446,8 +476,28 @@ const EAT={x:-29.2,z:-6.15};
   NPC.cook.g.position.set(-35.3,0,-5.2);addBlock(-35.8,-34.8,-5.7,-4.7);
   NPC.captain={...makeCrew({shirt:0x1c2b4a,hat:'cap',skin:0xd2a88a}),lines:['Dördüncü! Gemi senden sorulur!','Kahve içiyorum, rahatsız etme.','Bu gemide kimse yorulmaz, çalışır.','Sabahki raporu hazırladın mı?','Oğlum bu mesleğin cilvesi bu.'],cd:rand(2,5)};
   NPC.captain.g.position.set(-.3,0,-5.6);addBlock(-.8,.2,-6.1,-5.1);
+  NPC.mate={...makeCrew({shirt:0xe9e9e4,hat:'cap',glasses:true,skin:0xd8b394}),cd:rand(2,5),lines:['Dördüncü! Formlar neredeyse biter, ben bitmem.','Disiplin! Disiplin, Dördüncü!','Bu gemide kural vardır, ben kuralım.','Koridorda toz gördüm, rapor yazarım.']};
+  NPC.mate.g.position.set(-12.6,0,1.9);addBlock(-13.1,-12.1,1.5,2.4);
+  NPC.chief={...makeCrew({shirt:0xd9691f,hat:'hard',skin:0xb98a68}),cd:rand(2,5),lines:['Evlat, makine ağlıyor, ben de ağlıyorum.','Yağ kokusu yoksa gemi yok.','Güverteye çıktın, hava aldın, yeter evlat!','Bu motoru ben büyüttüm, kimse dokunmasın!']};
+  NPC.chief.g.position.set(8.2,0,-2.8);addBlock(7.7,8.7,-3.3,-2.3);
+  NPC.bosun={...makeCrew({shirt:0x3b5368,hat:'beanie',mustache:true,skin:0xc29675}),cd:rand(2,5),lines:['Kardeşim, duydun mu? Hiç duymadın, değil mi...','Ben anlatırım, sen dinle, iş yapmaktan iyidir.','Bir sigara yakmak için denize atlamak mı lazım?','Bu gemide en akıllı kişi benim, kimse bilmez.']};
+  NPC.bosun.g.position.set(61,0,-2.0);addBlock(60.5,61.5,-2.5,-1.5);
 }
 await __stage(62,'Yemekhane ve mutfak');
+/* gizli yiyecekler (sabotaj görevi) */
+const QITEMS={
+ bean:{name:'Kuru fasulye konservesi',where:'köprüüstü',x:-7.1,z:-3.3,mx:-7.1,my:1.06,mz:-4.7},
+ pasta:{name:'Makarna paketi',where:'ofis',x:-16,z:-5.5,mx:-16.0,my:1.78,mz:-6.5},
+ chicken:{name:'Donmuş tavuk',where:'kamara',x:-19.2,z:-2.3,mx:-19.5,my:.22,mz:-1.7}
+};
+(function(){
+ const gm=new THREE.MeshBasicMaterial({color:0xf3b84b,transparent:true,opacity:.6,depthWrite:false});
+ for(const k in QITEMS){const q=QITEMS[k],g=new THREE.Group();g.position.set(q.mx,q.my,q.mz);ship.add(g);let m;
+  if(k==='bean'){m=new THREE.Mesh(new THREE.CylinderGeometry(.1,.1,.16,10),mat(0x7a4a22));g.add(m);g.add(new THREE.Mesh(new THREE.CylinderGeometry(.102,.102,.08,10),mat(0xd8c070)));}
+  else if(k==='pasta'){m=new THREE.Mesh(new THREE.BoxGeometry(.28,.07,.18),mat(0xe0c050));g.add(m);}
+  else{m=new THREE.Mesh(new THREE.SphereGeometry(.2,10,8),mat(0xe8b8a8));m.scale.set(1,.6,.7);g.add(m);}
+  const r=new THREE.Mesh(new THREE.TorusGeometry(.26,.025,6,20),gm);r.rotation.x=Math.PI/2;r.position.y=.02;g.add(r);q.mesh=g;g.visible=false;}
+})();
 /* BRIDGE */
 var helmWheel;
 {
@@ -518,7 +568,7 @@ const SEG=IS_TOUCH?56:70;const seaGeo=new THREE.PlaneGeometry(340,340,SEG,SEG);s
 const seaMat=new THREE.MeshStandardMaterial({color:0x1f5f8b,roughness:.45,metalness:.15,flatShading:true});
 const sea=new THREE.Mesh(seaGeo,seaMat);sea.position.set(20,-2.6,-2);sea.receiveShadow=true;scene.add(sea);
 const seaPos=seaGeo.attributes.position;
-let seaF=0;function animSea(t){if(IS_TOUCH&&(seaF++&1))return;const a=seaPos.array;for(let i=0;i<seaPos.count;i++){const x=a[i*3]+20,z=a[i*3+2]-2;a[i*3+1]=.26*Math.sin(.33*(x+t*5))+.2*Math.sin(.27*z-t*.9+x*.08)+.1*Math.sin(.9*(x+z+t*6)+1);}seaPos.needsUpdate=true;}
+let seaF=0;function animSea(t){if(IS_TOUCH&&(seaF++&1))return;const a=seaPos.array;const wa=1+1.7*wx.storm;for(let i=0;i<seaPos.count;i++){const x=a[i*3]+20,z=a[i*3+2]-2;a[i*3+1]=wa*(.26*Math.sin(.33*(x+t*5))+.2*Math.sin(.27*z-t*.9+x*.08)+.1*Math.sin(.9*(x+z+t*6)+1));}seaPos.needsUpdate=true;}
 const foamM=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.3,depthWrite:false});
 [[3.9],[-8.3]].forEach(([z])=>{const f=new THREE.Mesh(new THREE.PlaneGeometry(120,.9),foamM);f.rotation.x=-Math.PI/2;f.position.set(18.5,-2.45,z);scene.add(f);ship.userData.foam=ship.userData.foam||[];});
 // stars, moon, sun disc, gulls
@@ -533,6 +583,9 @@ const skyCol=new THREE.Color(),tmpC=new THREE.Color(),seaDay=new THREE.Color(0x1
 let sunE=0,sunMul=1;const WHITE=new THREE.Color(0xffffff);
 function updateSky(h,center){
   for(let i=0;i<SKY.length-1;i++){if(h>=SKY[i][0]&&h<=SKY[i+1][0]){skyCol.copy(SKY[i][1]).lerp(SKY[i+1][1],(h-SKY[i][0])/(SKY[i+1][0]-SKY[i][0]));break;}}
+  {const dayL=(h>=6&&h<18)?clamp(.28+Math.sin(Math.PI*(h-6)/12),.28,1):.14;tmpC.setRGB(.5,.55,.6).multiplyScalar(dayL);
+   skyCol.lerp(tmpC,clamp(wx.fog*.6+wx.storm*.75+wx.cloud*.3,0,.85));if(wx.flash>0)skyCol.lerp(WHITE,wx.flash*.55);
+   scene.fog.near=lerp(lerp(70,30,wx.storm),24,wx.fog);scene.fog.far=lerp(lerp(230,115,wx.storm),68,wx.fog);}
   scene.background.copy(skyCol);scene.fog.color.copy(skyCol);
   const day=h>=6&&h<18,f=day?(h-6)/12:((h<6?h+24:h)-18)/12;
   sunE=Math.sin(Math.PI*f);
@@ -540,7 +593,7 @@ function updateSky(h,center){
   sun.position.set(center.x+lerp(-55,55,f),center.y+8+55*e,center.z+32);sun.target.position.copy(center);
   if(day){sun.intensity=.3+.6*e;sun.color.setHex(e<.35?0xffb070:0xffffff);hemi.intensity=.5+.35*e;hemi.color.copy(skyCol).lerp(WHITE,.5);}
   else{sun.intensity=.1+.28*e;sun.color.setHex(0x7f9cff);hemi.intensity=.2;hemi.color.setHex(0x6a7aa8);}
-  hemi.groundColor.setHex(day?0x3a4a3c:0x10161c);sun.intensity*=sunMul;
+  hemi.groundColor.setHex(day?0x3a4a3c:0x10161c);sun.intensity*=sunMul;sun.intensity*=1-.55*clamp(wx.storm+wx.cloud*.5,0,1)-.25*wx.fog;hemi.intensity+=wx.flash*2.4;sun.intensity+=wx.flash*.8;
   const lum=day?clamp(.18+e*1.3,.18,1):.08;
   seaMat.color.copy(seaNight).lerp(seaDay,lum).lerp(skyCol,.12);
   stars.material.opacity=clamp((h-18.8)/1.5,0,1);
@@ -579,12 +632,14 @@ const P={};
   P.arms=[];
   for(const s of[-1,1]){
     const piv=new THREE.Group();piv.position.set(s*.3,.54,0);torso.add(piv);
-    const a=new THREE.Mesh(new THREE.CylinderGeometry(.06,.05,.64,8),skin);a.position.y=-.32;ad(a,piv);
-    const hd=new THREE.Mesh(new THREE.SphereGeometry(.07,8,6),skin);hd.position.y=-.67;ad(hd,piv);
-    piv.rotation.z=s*.07;piv.userData.hand=hd;
+    const a=new THREE.Mesh(new THREE.CylinderGeometry(.06,.055,.34,8),skin);a.position.y=-.17;ad(a,piv);
+    const el=new THREE.Group();el.position.y=-.34;piv.add(el);
+    const fa=new THREE.Mesh(new THREE.CylinderGeometry(.055,.05,.32,8),skin);fa.position.y=-.16;ad(fa,el);
+    const hd=new THREE.Mesh(new THREE.SphereGeometry(.07,8,6),skin);hd.position.y=-.33;ad(hd,el);
+    piv.rotation.z=s*.07;piv.userData.hand=hd;piv.userData.elbow=el;
     if(s===-1){
       const roseT=ctex(128,160,(g,w,h)=>{g.clearRect(0,0,w,h);g.strokeStyle='rgba(30,32,36,.9)';g.fillStyle='rgba(30,32,36,.35)';g.lineWidth=3;for(let r=34;r>4;r-=7){g.beginPath();g.arc(64,64,r,r*.3,r*.3+4.6);g.stroke();}g.beginPath();g.arc(64,64,36,0,7);g.fill();g.lineWidth=4;g.beginPath();g.moveTo(64,100);g.quadraticCurveTo(60,130,70,155);g.stroke();g.beginPath();g.ellipse(86,122,18,8,-.6,0,7);g.fill();g.beginPath();g.ellipse(42,128,18,8,.6,0,7);g.fill();});
-      const rm=new THREE.Mesh(new THREE.PlaneGeometry(.2,.26),new THREE.MeshBasicMaterial({map:roseT,transparent:true,depthWrite:false}));rm.position.set(-.058,-.22,.03);rm.rotation.y=-Math.PI/2.4;piv.add(rm);
+      const rm=new THREE.Mesh(new THREE.PlaneGeometry(.2,.26),new THREE.MeshBasicMaterial({map:roseT,transparent:true,depthWrite:false}));rm.position.set(-.058,-.15,.03);rm.rotation.y=-Math.PI/2.4;piv.add(rm);
     }
     P.arms.push(piv);
   }
@@ -594,6 +649,11 @@ const P={};
   const mh=new THREE.Mesh(new THREE.BoxGeometry(.4,.06,.18),mat(0xcfc9b0));mh.position.set(0,-.82,.4);mop.add(mh);hand.add(mop);P.props.mop=mop;
   const ham=new THREE.Group();const hs=new THREE.Mesh(new THREE.CylinderGeometry(.02,.02,.45,6),mat(0x6b4a2f));hs.position.y=-.1;ham.add(hs);const hh=new THREE.Mesh(new THREE.BoxGeometry(.2,.07,.07),steel);hh.position.y=-.32;ham.add(hh);ham.rotation.x=-.4;hand.add(ham);P.props.hammer=ham;
   const stp=new THREE.Group();const sb=new THREE.Mesh(new THREE.BoxGeometry(.12,.08,.1),mat(0x6a1b1b));sb.position.y=-.1;stp.add(sb);const sk=new THREE.Mesh(new THREE.CylinderGeometry(.02,.02,.14,6),mat(0x222));sk.position.y=-.2;stp.add(sk);hand.add(stp);P.props.stamp=stp;
+  const phn=new THREE.Group();
+  phn.add(new THREE.Mesh(new THREE.BoxGeometry(.085,.16,.012),mat(0x15181c,{metalness:0})));
+  const psc=new THREE.Mesh(new THREE.PlaneGeometry(.075,.145),new THREE.MeshBasicMaterial({color:0xcfe8ff}));psc.position.z=.0065;phn.add(psc);
+  const pgl=new THREE.Mesh(new THREE.CircleGeometry(.4,18),new THREE.MeshBasicMaterial({color:0x7fb8ff,transparent:true,opacity:.32,blending:THREE.AdditiveBlending,depthWrite:false}));pgl.position.z=.03;phn.add(pgl);
+  phn.scale.setScalar(1.8);phn.position.set(0,-.1,.06);hand.add(phn);P.props.phone=phn;
   Object.values(P.props).forEach(p=>p.visible=false);
   // neck + head
   const neck=new THREE.Mesh(new THREE.CylinderGeometry(.075,.085,.16,8),skin);neck.position.y=.7;ad(neck,torso);
@@ -603,7 +663,7 @@ const P={};
   for(const s of[-1,1]){
     const e=new THREE.Mesh(new THREE.SphereGeometry(.1,14,12),eyeW);e.position.set(s*.17,.09,.235);head.add(e);
     const pu=new THREE.Mesh(new THREE.SphereGeometry(.032,8,6),new THREE.MeshBasicMaterial({color:0x080808}));pu.position.set(s*.165,.04,.328);head.add(pu);
-    const lid=new THREE.Mesh(new THREE.SphereGeometry(.106,14,10),skin);lid.scale.set(1.06,.8,1.06);lid.position.set(s*.17,.128,.238);lid.rotation.z=-s*.24;head.add(lid);
+    const lid=new THREE.Mesh(new THREE.SphereGeometry(.106,14,10),skin);lid.scale.set(1.06,.8,1.06);lid.position.set(s*.17,.128,.238);lid.rotation.z=-s*.24;head.add(lid);(P.lids=P.lids||[]).push(lid);
     const bag=new THREE.Mesh(new THREE.SphereGeometry(.07,8,6),mat(0x8d8a70,{metalness:0}));bag.scale.set(1.5,.35,.7);bag.position.set(s*.17,-.015,.275);head.add(bag);
     const ear=new THREE.Mesh(new THREE.SphereGeometry(.06,8,6),skinD);ear.scale.set(.5,1,.8);ear.position.set(s*.37,.0,-.02);head.add(ear);
     const sb2=new THREE.Mesh(new THREE.SphereGeometry(1,8,6),mat(0x2b2b2e,{roughness:1,metalness:0}));sb2.scale.set(.05,.12,.08);sb2.position.set(s*.355,-.06,.07);head.add(sb2);
@@ -651,7 +711,14 @@ const TASKS=[
  {id:'lines',kind:'seq',seq:'arrows',title:'Palamarları kontrol et',loc:'Baş kasara',st:{x:68.4,z:-2.4,yaw:Math.PI/2},from:'Güverte Başı',msg:'Baş palamarları gevşemiş. Kontrol et, sık.',help:'Ok tuşlarına (ya da WASD) sırayla bas.',anim:'write',cat:'lines'},
  {id:'messmop',kind:'mash',title:'Yemekhaneyi sil',loc:'Yemekhane',st:{x:-29.2,z:-2.1,yaw:0},from:'Aşçı',msg:'Yemekhane balık suyu içinde. Sil şunu, kokudan yürünmüyor.',help:'A ve D tuşlarına sırayla bas, balık suyunu sil!',prop:'mop',anim:'scrub',cat:'fish'},
  {id:'fishcrates',kind:'seq',seq:'arrows',title:'Balık kasalarını istifle',loc:'Mutfak',st:{x:-38.3,z:-3.0,yaw:-Math.PI/2},from:'Aşçı',msg:'Liman balık yükledi. Kasaları buzluğa istifle. Bu hafta da balık!',help:'Ok tuşlarına (ya da WASD) sırayla bas.',anim:'write',cat:'fish'},
- {id:'galleywash',kind:'mash',title:'Mutfağı yağdan arındır',loc:'Mutfak',st:{x:-36.0,z:-2.4,yaw:0},from:'Aşçı',msg:'Tavalar, yağ, pul... Mutfağı kazı. Yarın da balık pişireceğim.',help:'A ve D tuşlarına sırayla bas, kazı!',prop:'mop',anim:'scrub',cat:'fish'}
+ {id:'galleywash',kind:'mash',title:'Mutfağı yağdan arındır',loc:'Mutfak',st:{x:-36.0,z:-2.4,yaw:0},from:'Aşçı',msg:'Tavalar, yağ, pul... Mutfağı kazı. Yarın da balık pişireceğim.',help:'A ve D tuşlarına sırayla bas, kazı!',prop:'mop',anim:'scrub',cat:'fish'},
+ {id:'lashing',kind:'seq',seq:'arrows',title:'Ambar kapaklarını bağla',loc:'Güverte · 2 no.lu ambar',st:{x:33,z:.9,yaw:Math.PI},from:'Birinci Zabit',msg:'Fırtına geliyor! Ambar kapaklarını bağla, hemen!',help:'Ok tuşlarına sırayla bas, halatları sık!',anim:'write',cat:'storm',wx:'storm'},
+ {id:'foghorn',kind:'stamp',label:'DÜDÜK',title:'Sis düdüğünü çal',loc:'Köprüüstü',st:{x:-3,z:-4.45,yaw:0},from:'Kaptan',msg:'Sis çöktü. Düdüğü düzenli çal, Dördüncü!',help:'İşaretçi yeşildeyken BOŞLUK ya da dokun!',anim:'stamp',cat:'helm',wx:'fog',before:720},
+ {id:'nightwatch',kind:'radar',title:'Gece gözcülüğü',loc:'Köprüüstü · radar',st:{x:1.3,z:-5.0,yaw:0},from:'Kaptan',msg:'Gece nöbeti sende. Radarı izle, sandal, şamandıra, ne görürsen bildir.',help:'Radardaki işaretlere dokun, bildir!',anim:'write',cat:'night',after:1200},
+ {id:'firedrill',kind:'seq',seq:'arrows',title:'Yangın tatbikatı',loc:'Güverte · toplanma yeri',st:{x:14,z:1.5,yaw:0},from:'Kaptan',msg:'YANGIN TATBİKATI! Toplanma yerine koş, can yeleği ve kaskı giy!',help:'Ok tuşlarıyla yeleği giy, hızlı!',anim:'write',cat:'drill',manual:true,emergency:true},
+ {id:'mobdrill',kind:'helm',title:'Adam denize düştü tatbikatı',loc:'Köprüüstü',st:{x:-3,z:-4.45,yaw:0},from:'Kaptan',msg:'ADAM DENİZE DÜŞTÜ! Dümene koş, gemiyi geri döndür!',help:'A / D ile dümeni çevir, iğneyi yeşilde tut.',anim:'helm',cat:'drill',manual:true,emergency:true},
+ {id:'mateform',kind:'seq',seq:'letters',title:"Birinci Zabit'in ek formu",loc:'Zabit ofisi',st:{x:-13,z:-4.4,yaw:0},from:'Birinci Zabit',msg:'Ek formu doldur. Sabaha kadar masamda olsun.',help:'Ekrandaki tuşlara sırayla bas.',prop:'stamp',anim:'write',cat:'paper',manual:true},
+ {id:'oilcans',kind:'seq',seq:'arrows',title:'Yağ bidonlarını taşı',loc:'Güverte',st:{x:6.3,z:-1.5,yaw:0},from:'Başmühendis',msg:'Evlat, 3 bidon yağ var, güverteye taşı.',help:'Ok tuşlarıyla bidonları taşı.',anim:'write',cat:'lines',manual:true}
 ];
 const SAY={
  general:["Sikeyim böyle gemiyi, sikeyim böyle işi!","Amına koyayım bu vardiyanın!","Orospu çocuğu armatör, batsın bu gemi!","Allah belanızı versin hepinizin!","Siktir git hayat, siktir git meslek!","Anasını sikeyim, yine mi iş?!","Bok gibi iş, bok gibi maaş, bok gibi hayat.","Kahrolası gemi, lanet olası okyanus!","Hepinizin içine edeyim!","Ben bunu hak edecek ne yaptım Allah'ım?!","Ağzıma sıçtılar resmen.","Şerefsizler, insan yerine koymuyorlar!","Ulan götüm yırtıldı bu gemide!"],
@@ -668,6 +735,10 @@ const SAY={
  walk:["Ya sabır... siktir ya sabır...","Hep ben, hep ben, amına koyayım...","Bu gemi bitmiyor, ben de bitiyorum...","Maaş yok, uyku yok, hayat yok...","Evde kedim bile beni özlemiştir, siktir...","Kaptan köprüde kahve içiyor, ben götümle boka batıyorum..."],
  ret:["Kamaram... kamaram... siktirin gidin...","Bir dakika dinlensem yeter...","Şimdi yatağa... ahh..."],
  wave:["Dalga da siktir, gemi de siktir!","Ya sabır... yine mi, amına koyayım!?","Gemi sallanıyor, kafam sallanıyor, bok gibi..."],
+ storm:["Fırtına da bana denk geldi, Allah belanızı versin!","Güverte kayıyor, götüm kayıyor, hayat kayıyor!","Bu dalgayı yaratan şerefsizi bulacağım...","Boğulacağım ve kimse fark etmeyecek, siktir!","Yağmur da orospu çocuğu, rüzgâr da!"],
+ night:["Gece nöbeti... gözlerim kanıyor, siktir!","Radar yeşil, ben mosmor...","Kim gelecek bu saatte, kim?! Ben gideyim yatağıma!","Uyursam kaptan beni denize atar, uyumazsam ben kendimi atarım."],
+ drill:["Tatbikat mı?! Gerçek yangın olsa en azından bitirirdi bu işi!","Can yeleği de bok gibi, kask da bok gibi, ben de!","Adam denize düşse de kurtulsam şu gemiden...","Tatbikat, tatbikat... bu gemi zaten tatbikat hayatı!"],
+ nofish:["TAVUK! TAVUK GÖRÜYORUM! Allah'ım yaşıyorum!","Balık yok... balık YOK! Ağlıyorum lan!","Aşçıya bir kere olsun sevgi duydum.","Kuru fasulye, aşkım, hayatım, balığın tersi!"],
  fail:["Siktir! Elim ayağıma dolaştı!","Hay amına koyayım!","Bir de bu çıktı, bok!"],
  morning:["Daha yeni yattım lan... 06:00 mu, siktir!","Alarm da bok, saat de bok...","Bir gün daha... bir gün daha cehennem, amına koyayım."]
 };
@@ -696,11 +767,26 @@ const sfx={
   ok(){tone(660,.08,'triangle',.1);tone(990,.12,'triangle',.1,0,.08);},
   tick(){tone(500+Math.random()*80,.03,'triangle',.05);},
   done(){tone(520,.1,'triangle',.12);tone(660,.1,'triangle',.12,0,.1);tone(880,.2,'triangle',.12,0,.2);},
-  slosh(){tone(180+Math.random()*60,.1,'sine',.05,-40);}
+  slosh(){tone(180+Math.random()*60,.1,'sine',.05,-40);},
+  thunder(){tone(55,1.6,'sawtooth',.45,-25);tone(80,1.1,'square',.12,-40,.15);}
 };
 
 /* ---------- state ---------- */
-const G={state:'title',day:1,min:360,hp:100,st:100,moral:70,phase:'rest',task:null,last:null,bag:[],callT:7,nagT:0,done:0,doneToday:0,fail:0,curses:0,cursesToday:0,lying:true,teaCD:0,ev:{},swellT:70,talkT:6,tiredT:0,morning:true,ate:{},meal:null,dish:'',fish:0,fishToday:0};
+const G={state:'title',day:1,min:360,hp:100,st:100,moral:70,phase:'rest',task:null,last:null,bag:[],callT:7,nagT:0,done:0,doneToday:0,fail:0,curses:0,cursesToday:0,lying:true,teaCD:0,ev:{},swellT:70,talkT:6,tiredT:0,morning:true,ate:{},meal:null,dish:'',fish:0,fishToday:0,queue:[],saveT:6,dlg:null,quest:null,noFishNext:false,dishFish:true,emerT:0,drillAt:0,drillType:''};
+function newQuest(){return{step:0,items:{},doneDay:-9};}
+G.quest=newQuest();
+const wx={type:'clear',fog:0,rain:0,storm:0,cloud:0,flash:0,flashT:8};
+const WXT={clear:{fog:0,rain:0,storm:0,cloud:0},cloudy:{fog:.1,rain:0,storm:.1,cloud:1},fog:{fog:1,rain:0,storm:0,cloud:.5},storm:{fog:.3,rain:1,storm:1,cloud:1}};
+const WXNAME={clear:'AÇIK',cloudy:'BULUTLU',fog:'SİSLİ',storm:'FIRTINA'};
+function curTarget(){let tg=WXT[wx.type]||WXT.clear;if(wx.type==='storm'&&G.min<780)tg=WXT.cloudy;if(wx.type==='fog'&&G.min>=720)tg=WXT.clear;return tg;}
+function setWeather(type,instant){wx.type=type;if(instant){const tg=curTarget();wx.fog=tg.fog;wx.rain=tg.rain;wx.storm=tg.storm;wx.cloud=tg.cloud;}}
+function pickWeather(){if(G.day===1)return 'clear';const w=[['clear',34],['cloudy',24],['fog',14],['storm',Math.min(30,8+G.day*3)]];let r=Math.random()*w.reduce((a,b)=>a+b[1],0);for(const x of w){r-=x[1];if(r<=0)return x[0];}return 'clear';}
+function updateWeather(dt){
+  const tg=curTarget(),k=Math.min(1,dt*.35);
+  wx.fog=lerp(wx.fog,tg.fog,k);wx.rain=lerp(wx.rain,tg.rain,k);wx.storm=lerp(wx.storm,tg.storm,k);wx.cloud=lerp(wx.cloud,tg.cloud,k);
+  wx.flash=Math.max(0,wx.flash-dt*2.2);
+  if(wx.storm>.6){wx.flashT-=dt;if(wx.flashT<=0){wx.flashT=rand(6,14);wx.flash=1;setTimeout(()=>{sfx.thunder();swell=Math.max(swell,.6);},rand(300,1100));}}
+}
 const TIME_SCALE=2.5;
 const pos=new THREE.Vector3(-20.2,0,-4.3);let yaw=0,time=0,swell=0;
 const keys=new Set();
@@ -773,7 +859,7 @@ const MINI={
     const bx=60,bw=440,by=170;g.fillStyle='#1a211e';g.fillRect(bx,by,bw,26);g.strokeStyle='#4b564f';g.strokeRect(bx,by,bw,26);
     const zw=bw*d.w*(.65+.35*eff());g.fillStyle=d.cool>0?'#5b3a38':'#3f8f4f';g.fillRect(bx+bw*d.zone-zw/2,by+1,zw,24);
     g.fillStyle='#f3b84b';g.fillRect(bx+bw*d.m-3,by-6,6,38);
-    g.fillStyle='#e9e4d2';g.font='bold 14px Trebuchet MS';g.textAlign='center';g.fillText(`DAMGA ${d.marks.length}/5`,280,by+52);}
+    g.fillStyle='#e9e4d2';g.font='bold 14px Trebuchet MS';g.textAlign='center';g.fillText(`${MG.task.label||'DAMGA'} ${d.marks.length}/5`,280,by+52);}
  },
  seq:{
   init(){const d=MG.d,t=MG.task,len=7+Math.min(5,G.day-1);d.i=0;d.len=len;d.ar=t.seq==='arrows'||IS_TOUCH;d.items=Array.from({length:len},()=>d.ar?pick(['↑','↓','←','→']):LETTERS[Math.floor(Math.random()*LETTERS.length)]);d.err=0;},
@@ -796,16 +882,34 @@ const MINI={
     d.sparks.forEach(s=>{g.fillStyle=`rgba(255,220,120,${s.a})`;g.fillRect(s.x,s.y,3,3);});
     g.fillStyle='rgba(255,255,255,.75)';g.font='bold 13px Trebuchet MS';g.textAlign='left';g.fillText(`Pas: ${d.killed}/${d.total}`,10,MH-8);}
  },
+ radar:{
+  init(){const d=MG.d;d.hit=0;d.need=6;d.blips=[];d.spawnT=.6;d.sweep=0;d.miss=0;},
+  click(x,y){const d=MG.d;P.act=.2;for(const b of d.blips){if(Math.hypot(b.x-x,b.y-y)<b.r+12){d.blips.splice(d.blips.indexOf(b),1);d.hit++;MG.prog=d.hit/d.need;sfx.ok();return;}}sfx.tick();},
+  update(dt){const d=MG.d;d.sweep+=dt*1.8;d.spawnT-=dt;
+    if(d.spawnT<=0&&d.blips.length<3){const a=rand(0,Math.PI*2),r=rand(30,105);d.blips.push({x:280+Math.cos(a)*r*1.35,y:118+Math.sin(a)*r*.8,r:11,life:3.6,max:3.6});d.spawnT=rand(.5,1.1);}
+    d.blips.forEach(b=>b.life-=dt);
+    const lost=d.blips.filter(b=>b.life<=0);if(lost.length){d.miss+=lost.length;G.moral=Math.max(0,G.moral-1.5*lost.length);sfx.bad();MG.flash=.25;}
+    d.blips=d.blips.filter(b=>b.life>0);},
+  draw(){const d=MG.d,g=mx;g.fillStyle='#07120d';g.fillRect(0,0,MW,MH);
+    g.strokeStyle='#1f6b3f';g.lineWidth=1.5;for(let r=40;r<=120;r+=40){g.beginPath();g.ellipse(280,118,r*1.35,r*.8,0,0,7);g.stroke();}
+    g.beginPath();g.moveTo(130,118);g.lineTo(430,118);g.moveTo(280,10);g.lineTo(280,226);g.stroke();
+    g.strokeStyle='#4fe08a';g.lineWidth=3;g.beginPath();g.moveTo(280,118);g.lineTo(280+Math.cos(d.sweep)*165,118+Math.sin(d.sweep)*100);g.stroke();
+    d.blips.forEach(b=>{const k=b.life/b.max;g.fillStyle='rgba(120,255,160,'+(.35+.65*k)+')';g.beginPath();g.arc(b.x,b.y,b.r*(.6+.4*Math.sin(MG.t*8)),0,7);g.fill();g.strokeStyle='rgba(120,255,160,'+k+')';g.lineWidth=2;g.beginPath();g.arc(b.x,b.y,b.r+8*k+4,0,7);g.stroke();});
+    g.fillStyle='#8fd9a5';g.font='bold 14px Trebuchet MS';g.textAlign='left';g.fillText('Bildirilen: '+d.hit+'/'+d.need+'   Kaçırılan: '+d.miss,12,MH-10);}
+ },
  eat:{
   init(){const d=MG.d;d.chew=0;d.cool=0;d.total=7;d.crumbs=[];},
   key(e){if(e.code==='Space'||e.code==='KeyE')MINI.eat.bite();},
   click(){MINI.eat.bite();},
   bite(){const d=MG.d;if(d.cool>0)return;P.act=.25;d.chew=.35;
-    if(Math.random()<.18){MG.flash=.5;G.hp=Math.max(1,G.hp-1.5);sfx.bad();say('KILÇIK! Boğazıma kaçtı, sikeyim!',2.4);d.cool=.6;}
+    if(MG.task.fishy!==false&&Math.random()<.18){MG.flash=.5;G.hp=Math.max(1,G.hp-1.5);sfx.bad();say('KILÇIK! Boğazıma kaçtı, sikeyim!',2.4);d.cool=.6;}
     else{MG.prog+=1/d.total;sfx.tick();for(let i=0;i<4;i++)d.crumbs.push({x:280+rand(-40,40),y:110,vx:rand(-60,60),vy:rand(-90,-20),a:1});}},
   update(dt){const d=MG.d;d.chew=Math.max(0,d.chew-dt);d.cool=Math.max(0,d.cool-dt);d.crumbs.forEach(c=>{c.x+=c.vx*dt;c.y+=c.vy*dt;c.vy+=300*dt;c.a-=dt*1.6;});d.crumbs=d.crumbs.filter(c=>c.a>0);},
   draw(){const d=MG.d,g=mx;g.fillStyle='#2a2f2c';g.fillRect(0,0,MW,MH);
     g.fillStyle='#e8e6dc';g.beginPath();g.ellipse(280,130,170,80,0,0,7);g.fill();g.fillStyle='#cfcdc2';g.beginPath();g.ellipse(280,130,130,58,0,0,7);g.fill();
+    if(MG.task.fishy===false){const k0=1-MG.prog;g.fillStyle='#8a5a2e';g.beginPath();g.ellipse(280,128,95*k0+8,38*k0+4,0,0,7);g.fill();g.fillStyle='#b67d3d';for(let i=0;i<14;i++){g.beginPath();g.arc(280+Math.cos(i*1.7)*70*k0,128+Math.sin(i*2.3)*26*k0,6*k0+1,0,7);g.fill();}
+      d.crumbs.forEach(c=>{g.fillStyle='rgba(210,170,110,'+c.a+')';g.fillRect(c.x,c.y,4,4);});
+      g.fillStyle='#e9e4d2';g.font='bold 14px Trebuchet MS';g.textAlign='center';g.fillText(MG.task.title,280,MH-34);g.fillText('BOŞLUK / dokun: ye',280,MH-14);return;}
     const k=1-MG.prog;g.save();g.translate(280,128);
     g.fillStyle=`rgba(160,176,184,${.2+.8*k})`;g.beginPath();g.ellipse(0,0,105*k+10,34*k+4,0,0,7);g.fill();
     g.fillStyle=`rgba(138,155,163,${.2+.8*k})`;g.beginPath();g.moveTo(-95*k-10,0);g.lineTo(-135,-26);g.lineTo(-135,26);g.closePath();g.fill();
@@ -817,7 +921,7 @@ const MINI={
  helm:{
   init(){const d=MG.d;d.a=rand(-35,35);d.v=0;d.zone=15/Math.sqrt(diff());d.in=false;},
   key(){},
-  update(dt){const d=MG.d;const drift=(Math.sin(MG.t*.9)+.6*Math.sin(MG.t*2.3+1)+.4*swell*Math.sin(MG.t*4))*20*diff();d.v+=drift*dt;
+  update(dt){const d=MG.d;const drift=(Math.sin(MG.t*.9)+.6*Math.sin(MG.t*2.3+1)+.4*swell*Math.sin(MG.t*4))*20*diff()*(1+.7*wx.storm);d.v+=drift*dt;
     const L=keys.has('KeyA')||keys.has('ArrowLeft'),R=keys.has('KeyD')||keys.has('ArrowRight');if(L)d.v-=95*dt;if(R)d.v+=95*dt;if(L||R)P.act=.1;
     d.v*=Math.pow(.3,dt);d.a+=d.v*dt;if(Math.abs(d.a)>75){d.a=Math.sign(d.a)*75;d.v=0;}
     d.in=Math.abs(d.a)<d.zone;if(d.in)MG.prog+=dt/14*eff();else MG.prog=Math.max(0,MG.prog-dt/35);
@@ -830,7 +934,7 @@ const MINI={
     g.fillStyle='#e9e4d2';g.font='bold 18px Trebuchet MS';g.textAlign='center';g.fillText(`ROTA ${String(Math.round(87+d.a)).padStart(3,'0')}°`,cx,60);g.font='13px Trebuchet MS';g.fillStyle='#8d9a8f';g.fillText('◄ A     D ►',cx,MH-10);}
  }
 };
-const PADS={mash:[['◄','KeyA'],['►','KeyD']],helm:[['◄','KeyA'],['►','KeyD']],seq:[['◄','ArrowLeft'],['▲','ArrowUp'],['▼','ArrowDown'],['►','ArrowRight']],stamp:[['DAMGA','Space']],eat:[['ISIR','Space']],rust:[]};
+const PADS={radar:[],mash:[['◄','KeyA'],['►','KeyD']],helm:[['◄','KeyA'],['►','KeyD']],seq:[['◄','ArrowLeft'],['▲','ArrowUp'],['▼','ArrowDown'],['►','ArrowRight']],stamp:[['DAMGA','Space']],eat:[['ISIR','Space']],rust:[]};
 function buildPad(kind){
   const p=$('pad');p.innerHTML='';if(!IS_TOUCH)return;
   (PADS[kind]||[]).forEach(([lab,code])=>{const b=document.createElement('button');b.className='pb';b.textContent=lab;
@@ -845,7 +949,7 @@ function startMini(task){if(joy.active||runHeld)resetJoy();
   MINI[task.kind].init();Object.entries(P.props).forEach(([k,p])=>p.visible=k===task.prop);
 }
 function endMini(){$('pad').innerHTML='';if(IS_TOUCH){keys.clear();runHeld=false;if(typeof resetJoy==='function')resetJoy();}MG.active=false;$('mini').classList.add('hidden');Object.values(P.props).forEach(p=>p.visible=false);}
-function abortMini(){const wasMeal=MG.task&&MG.task.meal;endMini();if(!wasMeal)G.phase='toTask';say('Bırak ya, bir nefes alayım...',2.2,'thought');}
+function abortMini(){const keep=MG.task&&(MG.task.meal||MG.task.sabotage);endMini();if(!keep)G.phase='toTask';say('Bırak ya, bir nefes alayım...',2.2,'thought');}
 function miniKey(e){const m=MINI[MG.kind];m.key&&m.key(e);}
 mc.addEventListener('pointerdown',e=>{if(!MG.active)return;const r=mc.getBoundingClientRect(),x=(e.clientX-r.left)*MW/r.width,y=(e.clientY-r.top)*MH/r.height;const m=MINI[MG.kind];m.click&&m.click(x,y);});
 function updateMini(dt){
@@ -864,8 +968,13 @@ function updateMini(dt){
 /* ============================================================
    GAME FLOW
    ============================================================ */
+function taskOK(t){return !t.manual&&(!t.after||G.min>=t.after)&&(!t.before||G.min<t.before)&&(!t.wx||(wx.type===t.wx&&(t.wx!=='storm'||wx.storm>.3)));}
 function nextTask(){
-  if(!G.bag.length){G.bag=shuffle(TASKS.slice());if(G.last&&G.bag[G.bag.length-1].id===G.last){G.bag.unshift(G.bag.pop());}}
+  if(G.queue.length){const id=G.queue.shift();const q=TASKS.find(x=>x.id===id);if(q)return q;}
+  const spec=TASKS.filter(t=>(t.wx||t.after||t.before)&&taskOK(t)&&t.id!==G.last);
+  if(spec.length&&Math.random()<.45)return pick(spec);
+  const pool=TASKS.filter(t=>!t.wx&&!t.after&&!t.before&&!t.manual);
+  if(!G.bag.length){G.bag=shuffle(pool.slice());if(G.last&&G.bag[G.bag.length-1].id===G.last){G.bag.unshift(G.bag.pop());}}
   let t=G.bag.pop();if(t.id===G.last&&G.bag.length){const o=G.bag.pop();G.bag.push(t);t=o;}
   return t;
 }
@@ -873,7 +982,7 @@ function callTask(){
   const t=nextTask();G.task=t;G.last=t.id;G.phase='toTask';G.nagT=45;
   if(G.lying){G.lying=false;pos.copy(BUNK);}
   G.moral=Math.max(0,G.moral-3);
-  sfx.knock();setTimeout(()=>radio(t.from,t.msg),500);
+  if(t.emergency){G.emerT=45;sfx.alarm();setTimeout(()=>radio(t.from,t.msg),300);}else{sfx.knock();setTimeout(()=>radio(t.from,t.msg),500);}
   say(pick(SAY.call),3.2);
   setTaskPanel(t.title,t.msg,'📍 '+t.loc);
 }
@@ -885,11 +994,12 @@ function beginRest(){
 function beginTask(){
   const t=G.task;const s=t.st;
   // snap to station if reachable
-  pos.set(s.x,0,s.z);yaw=s.yaw;G.phase='working';startMini(t);
+  G.emerT=0;pos.set(s.x,0,s.z);yaw=s.yaw;G.phase='working';startMini(t);
   setTaskPanel(t.title,t.help,'📍 '+t.loc);
 }
 function finishTask(){
   if(MG.task.meal){finishMeal();return;}
+  if(MG.task.sabotage){finishSabotage();return;}
   endMini();G.phase='return';G.done++;G.doneToday++;G.moral=Math.min(100,G.moral+4);
   sfx.done();say(pick(SAY.done),3.2);
   radio('Görev tamam','"'+G.task.title+'" bitti. Kamarana dönebilirsin… şimdilik.');
@@ -897,10 +1007,12 @@ function finishTask(){
 }
 function beginMeal(){
   pos.set(EAT.x,0,EAT.z);yaw=0;
-  startMini({kind:'eat',title:`${G.meal.name}: ${G.dish}`,help:'Isır, çiğne, yut. Kılçığa dikkat.',anim:'eat',cat:'fish',meal:G.meal,noDrain:true});
+  startMini({kind:'eat',title:`${G.meal.name}: ${G.dish}`,help:G.dishFish?'Isır, çiğne, yut. Kılçığa dikkat.':'Yavaş ye, tadını çıkar. Balık değil!',anim:'eat',cat:G.dishFish?'fish':'nofish',meal:G.meal,fishy:G.dishFish,noDrain:true});
 }
 function finishMeal(){
-  const m=MG.task.meal;endMini();G.ate[m.id]=1;G.fish++;G.fishToday++;
+  const m=MG.task.meal;endMini();G.ate[m.id]=1;
+  if(MG.task.fishy===false){G.st=Math.min(100,G.st+32);G.hp=Math.min(100,G.hp+6);G.moral=Math.min(100,G.moral+8);sfx.done();say(pick(SAY.nofish),3.4);radio('Aşçı','Afiyet olsun! Yarın balık geri döner, merak etme.');return;}
+  G.fish++;G.fishToday++;
   G.st=Math.min(100,G.st+28);G.hp=Math.min(100,G.hp+4);G.moral=Math.max(0,G.moral-5);
   sfx.done();say(pick(["Hâlâ balık kokuyorum...","Bitti. Bir daha asla... yarın yine.","Boğazımdan kılçık gitmiyor, sikeyim."]),3.2);
   radio('Aşçı','Tabağını bitirdin, aferin. Yarın da balık!');
@@ -909,16 +1021,80 @@ function lieDown(){G.lying=true;pos.set(-19.85,0,-6);}
 function getUp(){G.lying=false;pos.copy(BUNK);}
 function drinkTea(){G.teaCD=40;G.st=Math.min(100,G.st+16);G.moral=Math.min(100,G.moral+5);sfx.ok();say('Soğumuş çay... yine de iyi geldi.',2.6,'thought');}
 function currentInteract(){
-  if(MG.active||G.state!=='play')return null;
+  if(MG.active||G.state!=='play'||G.dlg)return null;
   if(G.lying)return{text:'[E] Kalk',run:getUp};
   if(G.phase==='toTask'&&G.task&&dist2d(pos,G.task.st)<1.8)return{text:`[E] Göreve başla: ${G.task.title}`,run:beginTask};
   if(G.meal&&!G.ate[G.meal.id]&&dist2d(pos,EAT)<1.8)return{text:`[E] ${G.meal.name}: ${G.dish}`,run:beginMeal};
+  if(G.quest.step===1)for(const k in QITEMS){if(!G.quest.items[k]&&dist2d(pos,QITEMS[k])<1.7)return{text:`[E] Al: ${QITEMS[k].name}`,run:()=>collectItem(k)};}
+  if(G.quest.step===2&&dist2d(pos,STOVE)<1.7)return{text:'[E] Yemekleri değiştir (sabotaj)',run:beginSabotage};
+  for(const k in NPC){if(DLG[k]&&dist2d(pos,NPC[k].g.position)<2.3)return{text:`[E] Konuş: ${DLG[k].name}`,run:()=>openDlg(k)};}
   if(dist2d(pos,BUNK)<2)return{text:'[E] Yatağa uzan',run:lieDown};
   if(G.teaCD<=0&&dist2d(pos,TEA)<1.7)return{text:'[E] Su / çay iç (+derman)',run:drinkTea};
   return null;
 }
 function interact(){const it=currentInteract();if(it)it.run();}
 
+/* ---------- sabotaj görevi + diyaloglar ---------- */
+const STOVE={x:-38.8,z:-4.8};
+function syncQuestWorld(){for(const k in QITEMS)QITEMS[k].mesh.visible=(G.quest.step===1&&!G.quest.items[k]);}
+function collectItem(k){G.quest.items[k]=1;sfx.ok();const n=Object.keys(G.quest.items).length;say(`Buldum: ${QITEMS[k].name}! (${n}/3)`,2.6,'thought');if(n>=3){G.quest.step=2;radio('Plan','Üç malzeme tamam. Şimdi mutfağa git, ocağa sessizce yaklaş…');}syncQuestWorld();}
+function beginSabotage(){pos.set(STOVE.x,0,STOVE.z);yaw=0;startMini({kind:'seq',seq:'arrows',title:'Aşçıya sabotaj',help:'Sessiz ol! Ok tuşlarıyla malzemeleri değiştir.',anim:'write',cat:'fish',sabotage:true});}
+function finishSabotage(){
+  endMini();
+  if(Math.random()<.3){G.moral=Math.max(0,G.moral-6);radio('Aşçı','Seni gördüm! Elini çek oradan! Bir daha dene de görürsün!');say('Yakalandım, amına koyayım! Bir daha deneyeceğim...',3.2);}
+  else{G.quest.step=3;G.quest.doneDay=G.day;G.noFishNext=true;G.moral=Math.min(100,G.moral+8);radio('Aşçı','Bir şey mi koktu? Kim değiştirdi yemekleri?! Bulacağım seni!');say('Balık yok! Sabotaj başarılı, siktir!',3.4);}
+  syncQuestWorld();
+}
+const RUMORS=['Kaptan eski gemisinde de hep balık yedirmiş, o yüzden suratı öyle.','Duydun mu, 2. mühendis kaçmak için salıncaklı bot yapıyormuş.','Aşçının kamarasında gizli bir tavuk dolabı varmış, kimseye vermiyor!','Armatör iflas ediyormuş, maaşlar "yakında"ymış... yirmi aydır.','Birinci Zabit geceleri aynaya bakıp "disiplin!" diye bağırıyormuş.'];
+const DLG={
+ captain:{name:'KAPTAN',intro:()=>pick(['Dördüncü! Gemi senden sorulur.','Kahve içiyorum, rahatsız etme... ama söyle bakalım.','Bu gemide kimse yorulmaz, çalışır.']),
+  opts:()=>[
+   {label:'Kahve içebilir miyim?',run:()=>{G.moral=Math.max(0,G.moral-2);return 'Kahve subaylara. Sen çay iç, çay.';}},
+   {label:'Maaş zammı konuşabilir miyiz?',run:()=>{G.moral=Math.max(0,G.moral-3);return 'Gemi batmadan konuşuruz, Dördüncü. Yani asla.';}},
+   {label:'Dümeni devralayım mı?',run:()=>{G.queue.push('helm');G.moral=Math.max(0,G.moral-1);return 'İşte bu! Hemen geç dümene.';}},
+   {label:'Boş ver.',run:()=>null}]},
+ cook:{name:'AŞÇI',intro:()=>pick(['Dördüncü! Bugün balık, yarın balık. Neye ihtiyacın var?','Taze balık var! Dün yakalandı... bir hafta önce.','Aç mısın? Güzel. Balık var.']),
+  opts:()=>[
+   {label:'Menüde balık olmasa ne olur?',run:()=>{
+     if(G.quest.step===3&&G.day>=G.quest.doneDay+2)G.quest=newQuest();
+     if(G.quest.step===0){G.quest.step=1;syncQuestWorld();return 'Balıksız mı? Ha ha ha! Gemide balık dışı bir şey bulabilirsen belki. (Gizli yiyecek ara: köprüüstü, ofis, kamara. Sonra bana sezdirmeden ocağı değiştir...)';}
+     if(G.quest.step===1||G.quest.step===2)return 'Hâlâ onu mu düşünüyorsun? Git, bul, getir de göreyim.';
+     return 'Bugünlük bu kadar yeter. Balık zaten seni seviyor.';}},
+   {label:'Mutfağa yardım edeyim.',run:()=>{G.queue.push('galleywash');G.moral=Math.max(0,G.moral-1);return 'Aferin evlat! Yağlar seni bekliyor.';}},
+   {label:'Çorbanda balık var mı?',run:()=>{G.moral=Math.max(0,G.moral-1);return 'Çorbamda sadece balık var. Ve biraz da balık.';}},
+   {label:'Boş ver.',run:()=>null}]},
+ mate:{name:'BİRİNCİ ZABİT',intro:()=>pick(["Dördüncü! Checklist'in imzası eksik. Sen mi imzalayacaksın yoksa ben mi senin yerine yazayım?",'Dördüncü, koridorda bir toz gördüm. Sonra rapor yazarım.']),
+  opts:()=>[
+   {label:'İmzalarım efendim.',run:()=>{G.queue.push('mateform');G.moral=Math.max(0,G.moral-2);return 'Güzel. Bir de ek form var, hemen yolluyorum.';}},
+   {label:'Yorgunum, biraz sonra.',run:()=>{G.moral=Math.max(0,G.moral-4);return 'Yorgunluk bahane değil, Dördüncü. Not alıyorum.';}},
+   {label:'(içinden küfret, dışından gülümse)',run:()=>{if(Math.random()<.25){G.moral=Math.max(0,G.moral-3);return 'Yüzün neden öyle buruştu, Dördüncü? Alınmış mıyım?';}G.moral=Math.min(100,G.moral+3);return 'Aferin, böyle disiplinli devam.';}},
+   {label:'Boş ver.',run:()=>null}]},
+ chief:{name:'BAŞMÜHENDİS',intro:()=>pick(['Evlat! 3 bidon yağ çıkardım, güverteye taşıman lazım. Tayfa yok, sen varsın.','Evlat, makine dairesi ter koktu, sen de burnunu sokma.']),
+  opts:()=>[
+   {label:'Taşırım.',run:()=>{G.queue.push('oilcans');G.st=Math.max(0,G.st-4);return 'Aferin evlat, sırtın yağlanacak.';}},
+   {label:'Kaptana söyleyeyim mi?',run:()=>{G.moral=Math.max(0,G.moral-3);return 'Kaptan kahve içiyor, sen benden yakınıyorsun. Çek git.';}},
+   {label:'Çay ısmarla bari.',run:()=>{if(Math.random()<.4){G.st=Math.min(100,G.st+12);G.moral=Math.min(100,G.moral+4);return 'Al şu çayı, bir de küçük bir poğaça. Yağ kokmuyor, söz.';}return 'Çay yok, yağ var. Çek git.';}},
+   {label:'Boş ver.',run:()=>null}]},
+ bosun:{name:'GÜVERTE TAYFASI',intro:()=>pick(['Kardeşim! Duydun mu? Kaptan yeni gelen sigortacıyla balık yemiş.','Kardeşim, sana bir şey anlatacağım ama kimseye söyleme.']),
+  opts:()=>[
+   {label:'Dedikodu anlat.',run:()=>{G.moral=Math.min(100,G.moral+4);G.st=Math.max(0,G.st-2);if(G.quest.step===0&&Math.random()<.5)return 'Aşçının balık sevdası delilik. Gemide balık dışı bir şeyler saklanmış derler. Bir de ona sorsan, ne dersin...';return pick(RUMORS);}},
+   {label:'Bir sigara ver.',run:()=>{if(Math.random()<.5){G.st=Math.min(100,G.st+6);G.moral=Math.min(100,G.moral+5);return 'Al kardeşim, ama çatı altında yakma.';}G.moral=Math.max(0,G.moral-1);return 'Bende de yok kardeşim, yarımı kaldı.';}},
+   {label:'Çalışmam lazım.',run:()=>'Hep çalış, hep çalış... sen de benim gibi ol, gemi batsın.'},
+   {label:'Boş ver.',run:()=>null}]}
+};
+function openDlg(k){
+  resetJoy();G.dlg=k;const d=DLG[k];$('dlgName').textContent=d.name;$('dlgText').textContent=d.intro();const box=$('dlgOpts');box.innerHTML='';
+  d.opts().forEach(o=>{const b=document.createElement('button');b.textContent=o.label;b.onclick=()=>{const r=o.run();if(r==null){closeDlg();return;}$('dlgText').textContent=r;box.innerHTML='';const ok=document.createElement('button');ok.textContent='Tamam.';ok.onclick=closeDlg;box.appendChild(ok);};box.appendChild(b);});
+  $('dlg').classList.remove('hidden');
+}
+function closeDlg(){if(!G.dlg)return;G.dlg=null;$('dlg').classList.add('hidden');}
+function drawMenuText(top,main,sub,fish){const cv=MENUREF.tex.image,g=cv.getContext('2d'),w=cv.width;g.fillStyle='#1d2a24';g.fillRect(0,0,w,cv.height);g.fillStyle='#e9e4d2';g.font='bold 22px Arial';g.textAlign='center';g.fillText(top,w/2,32);g.font='bold '+(main.length>9?24:34)+'px Arial';g.fillStyle=fish?'#f3b84b':'#8ad07a';g.fillText(main,w/2,72);g.font='14px Arial';g.fillStyle='#b9b49c';g.fillText(sub,w/2,102);MENUREF.tex.needsUpdate=true;MENUREF.plates.forEach(f=>f.visible=fish);}
+function updateMenu(){
+  const nf=(G.day%5===0)||G.noFishNext;
+  if(G.meal)drawMenuText('ŞİMDİ SERVİSTE',G.dish.toUpperCase(),G.dishFish?'(tabii ki balık)':'(balık yok! kutlama!)',G.dishFish);
+  else if(nf)drawMenuText('BUGÜNÜN MENÜSÜ','SÜRPRİZ','balık yok gibi görünüyor...',true);
+  else drawMenuText('BUGÜNÜN MENÜSÜ','BALIK','yarın: balık · öbür gün: balık',true);
+}
 function startDay(n){
   G.day=n;G.min=360;G.state='play';G.phase='rest';G.callT=7;G.lying=true;G.task=null;G.ev={};G.doneToday=0;G.cursesToday=0;G.morning=true;G.ate={};G.meal=null;G.fishToday=0;
   G.hp=Math.min(100,G.hp+20);G.st=Math.max(G.st,Math.min(100,G.st+30));if(n>1)G.moral=Math.max(10,G.moral-5);
@@ -926,13 +1102,21 @@ function startDay(n){
   setTaskPanel('Kalk','Sabah 06:00. Alarm çalıyor. Telsiz de çalacak.','📍 Kamara');
   sfx.alarm();setTimeout(()=>say(pick(SAY.morning),3.6),700);
   radio('Kaptan',`Gün ${n}. Vardiya 06:00'da başladı, 24:00'e kadar sürer. Kahve yok.`);
+  G.dlg=null;$('dlg').classList.add('hidden');G.emerT=0;
+  setWeather(pickWeather(),true);
+  G.drillAt=(n>=2&&Math.random()<.7)?Math.floor(rand(560,1000)):0;G.drillType=Math.random()<.5?'firedrill':'mobdrill';
+  if(G.quest.step===3&&n>=G.quest.doneDay+2)G.quest=newQuest();
+  syncQuestWorld();updateMenu();
+  if(wx.type!=='clear')setTimeout(()=>radio('Köprüüstü','Bugünün hava durumu: '+WXNAME[wx.type]+'.'),2200);
+  if(n%5===0)setTimeout(()=>radio('Aşçı','Bugün balık yok. Ambardaki konserveler bitti. Boşuna sevinme.'),3800);
+  saveGame();
 }
 function endDay(){
   G.state='dayend';if(MG.active)endMini();$('prompt').classList.remove('show');clearBubbles();
   const msgs=['Gün bitti. Yatağa düştün. Yarın 06:00\'da yine görüşürüz.','Gözlerini kapattın. Telsiz sustu. Yarın yine 06:00.','Gemi sallanıyor, sen uyuyorsun. En azından birkaç saat.'];
   $('deT').textContent=`GÜN ${G.day} BİTTİ · 24:00`;$('deMsg').textContent=pick(msgs);
   $('deStats').innerHTML=`<span>Biten görev</span><span>${G.doneToday}</span><span>Küfür sayısı</span><span>${G.cursesToday}</span><span>Yenen balık</span><span>${G.fishToday}</span><span>Can</span><span>${Math.round(G.hp)}</span><span>Derman</span><span>${Math.round(G.st)}</span><span>Moral</span><span>${Math.round(G.moral)}</span>`;
-  $('dayend').classList.remove('hidden');
+  $('dayend').classList.remove('hidden');closeDlg();saveGame(true);
 }
 function die(){G.state='dead';if(MG.active)endMini();clearBubbles();$('dead').classList.remove('hidden');}
 
@@ -941,9 +1125,13 @@ const MEALS=[{id:'b',from:420,to:480,name:'Kahvaltı'},{id:'l',from:720,to:780,n
 function checkEvents(dt){
   const ev=G.ev;
   for(const m of MEALS){
-    if(G.min>=m.from&&!ev['s'+m.id]){ev['s'+m.id]=1;G.meal=m;G.dish=pick(FISH);radio('Aşçı',`${m.name} hazır! Bugünün menüsü: ${G.dish}. (Tabii ki balık.)`);setTimeout(()=>say(pick(SAY.fish),3.2),1200);}
-    if(G.min>=m.to&&ev['s'+m.id]&&!ev['e'+m.id]){ev['e'+m.id]=1;if(G.meal===m)G.meal=null;if(!G.ate[m.id]){G.st=Math.max(0,G.st-8);G.moral=Math.max(0,G.moral-2);radio('Aşçı','Yemek bitti. Aç kaldıysan benim suçum değil.');}}
+    if(G.min>=m.from&&!ev['s'+m.id]){ev['s'+m.id]=1;G.meal=m;const nf=(G.day%5===0)||G.noFishNext;G.dishFish=!nf;G.dish=pick(nf?NOFISH:FISH);if(G.noFishNext)G.noFishNext=false;updateMenu();
+      radio('Aşçı',nf?`${m.name} hazır! Bugünün menüsü: ${G.dish}. BALIK YOK!`:`${m.name} hazır! Bugünün menüsü: ${G.dish}. (Tabii ki balık.)`);setTimeout(()=>say(pick(nf?SAY.nofish:SAY.fish),3.2),1200);}
+    if(G.min>=m.to&&ev['s'+m.id]&&!ev['e'+m.id]){ev['e'+m.id]=1;if(G.meal===m)G.meal=null;updateMenu();if(!G.ate[m.id]){G.st=Math.max(0,G.st-8);G.moral=Math.max(0,G.moral-2);radio('Aşçı','Yemek bitti. Aç kaldıysan benim suçum değil.');}}
   }
+  if(wx.type==='storm'&&G.min>=750&&!ev.stormw){ev.stormw=1;radio('Köprüüstü','Fırtına yaklaşıyor! Güvertedekiler içeri, ambarlar sıkılsın!');}
+  if(wx.type==='fog'&&G.min>=720&&!ev.fogc){ev.fogc=1;radio('Köprüüstü','Sis dağılıyor. Düdüğü bırakabilirsin.');}
+  if(G.drillAt&&G.min>=G.drillAt&&!ev.drill){ev.drill=1;G.queue.unshift(G.drillType);radio('Kaptan','Kulağını aç, Dördüncü. Birazdan tatbikat var.');}
   if(G.min>=1080&&!ev.eve){ev.eve=1;radio('Kaptan','Akşam oldu ama gün bitmedi, Dördüncü.');}
   if(G.min>=1320&&!ev.late){ev.late=1;radio('Birinci Zabit','Gece yarısına kadar bitmemiş iş kalmasın.');}
   G.swellT-=dt;if(G.swellT<=0){G.swellT=rand(60,100);swell=1;radio('Köprüüstü','Büyük dalga geliyor, sıkı tutunun!');setTimeout(()=>{say(pick(SAY.wave),3);if(!inInterior())G.st=Math.max(0,G.st-8);},1500);}
@@ -958,6 +1146,7 @@ addEventListener('keydown',e=>{
   if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();
   if(G.state!=='play')return;
   if(e.code==='KeyM'){muted=!muted;if(master)master.gain.value=muted?0:.55;return;}
+  if(G.dlg){if(e.code==='Escape')closeDlg();return;}
   if(MG.active){if(e.code==='Escape'){abortMini();return;}if(!e.repeat)miniKey(e);return;}
   if(e.code==='KeyE'&&!e.repeat)interact();
 });
@@ -982,11 +1171,9 @@ addEventListener('resize',placeJoyIdle);addEventListener('blur',resetJoy);docume
   $('prompt').addEventListener('pointerdown',e=>{if(G.state==='play'&&!MG.active)interact();});
   $('miniEsc').addEventListener('pointerdown',()=>{if(MG.active)abortMini();});
   document.addEventListener('touchmove',e=>{if(!(e.target.closest&&e.target.closest('.overlay')))e.preventDefault();},{passive:false});
-  // pinch zoom
-  const cv=$('c'),pts=new Map();let pd=0;
-  cv.addEventListener('pointerdown',e=>{pts.set(e.pointerId,e);pd=0;});
-  cv.addEventListener('pointermove',e=>{if(!pts.has(e.pointerId))return;pts.set(e.pointerId,e);if(pts.size===2){const [a,b]=[...pts.values()],d=Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY);if(pd)zoomBase=clamp(zoomBase-(d-pd)*.04,9,32);pd=d;}});
-  ['pointerup','pointercancel','pointerleave'].forEach(n=>cv.addEventListener(n,e=>{pts.delete(e.pointerId);pd=0;}));
+  // mobilde yakınlaştırma kapalı
+  ['gesturestart','gesturechange','gestureend'].forEach(n=>document.addEventListener(n,e=>e.preventDefault()));
+  let lastTap=0;document.addEventListener('touchend',e=>{const n=Date.now();if(n-lastTap<350&&!(e.target.closest&&e.target.closest('button')))e.preventDefault();lastTap=n;},{passive:false});
 })();
 function npcUpdate(dt,t){
   for(const k in NPC){const n=NPC[k];
@@ -1020,7 +1207,57 @@ function drawPortrait(){
 
 addEventListener('blur',()=>keys.clear());
 addEventListener('wheel',e=>{zoomBase=clamp(zoomBase+Math.sign(e.deltaY)*1.5,9,32);},{passive:true});
-window.__start=()=>{if(G.state!=='title')return;try{initAudio();}catch(e){}if(IS_TOUCH)document.body.classList.add('touch');$('title').classList.add('hidden');$('hud').classList.remove('hidden');startDay(1);};
+const SAVE_KEY='kaptan4_save_v1';
+function readSave(){try{const r=localStorage.getItem(SAVE_KEY);if(!r)return null;const o=JSON.parse(r);return o&&o.v===1?o:null;}catch(e){return null;}}
+function clearSave(){try{localStorage.removeItem(SAVE_KEY);}catch(e){}}
+function saveGame(dayend){
+  if(!dayend&&G.state!=='play')return;
+  try{localStorage.setItem(SAVE_KEY,JSON.stringify({v:1,t:Date.now(),dayend:!!dayend,day:G.day,min:G.min,hp:G.hp,st:G.st,moral:G.moral,done:G.done,doneToday:G.doneToday,curses:G.curses,cursesToday:G.cursesToday,fish:G.fish,fishToday:G.fishToday,phase:G.phase==='working'?'toTask':G.phase,task:G.task?G.task.id:null,last:G.last,bag:G.bag.map(x=>x.id),queue:G.queue,callT:G.callT,ate:G.ate,ev:G.ev,meal:G.meal?G.meal.id:null,dish:G.dish,dishFish:G.dishFish,lying:G.lying,px:pos.x,pz:pos.z,wx:wx.type,quest:G.quest,noFishNext:G.noFishNext,drillAt:G.drillAt,drillType:G.drillType}));}catch(e){}
+}
+function applySave(o){
+  G.day=o.day;G.min=o.min;G.hp=o.hp;G.st=o.st;G.moral=o.moral;G.done=o.done||0;G.doneToday=o.doneToday||0;G.curses=o.curses||0;G.cursesToday=o.cursesToday||0;G.fish=o.fish||0;G.fishToday=o.fishToday||0;
+  G.last=o.last||null;G.bag=(o.bag||[]).map(id=>TASKS.find(x=>x.id===id)).filter(Boolean);G.queue=o.queue||[];G.ate=o.ate||{};G.ev=o.ev||{};
+  G.meal=o.meal?(MEALS.find(m=>m.id===o.meal)||null):null;G.dish=o.dish||'';G.dishFish=o.dishFish!==false;G.quest=o.quest||newQuest();G.noFishNext=!!o.noFishNext;G.drillAt=o.drillAt||0;G.drillType=o.drillType||'';
+  G.task=o.task?(TASKS.find(x=>x.id===o.task)||null):null;
+  G.phase=o.phase||'rest';if(G.phase==='toTask'&&!G.task)G.phase='rest';
+  G.callT=o.callT||8;G.nagT=45;G.emerT=G.task&&G.task.emergency?30:0;G.lying=!!o.lying;pos.set(o.px,0,o.pz);G.state='play';G.dlg=null;
+  if(G.lying)pos.set(-19.85,0,-6);
+  setWeather(o.wx||'clear',true);syncQuestWorld();updateMenu();
+  if(G.task&&G.phase==='toTask')setTaskPanel(G.task.title,G.task.msg,'📍 '+G.task.loc);
+  else if(G.phase==='return')setTaskPanel('Kamaraya dön','Görev bitti. Biraz dinlen (dinlenebilirsen).','📍 Kamara');
+  else setTaskPanel('Dinlen','Kamaranda soluklan. Telsiz çalmazsa şanslısın.','📍 Kamara · yatağa [E]');
+}
+document.addEventListener('visibilitychange',()=>{if(document.hidden)saveGame();});
+addEventListener('pagehide',()=>saveGame());
+function showHud(){if(IS_TOUCH)document.body.classList.add('touch');$('title').classList.add('hidden');$('hud').classList.remove('hidden');}
+let confirmNew=false;
+window.__start=()=>{
+  if(G.state!=='title')return;
+  if(readSave()&&!confirmNew){confirmNew=true;$('startBtn').textContent='EMİN MİSİN? KAYIT SİLİNİR';return;}
+  clearSave();try{initAudio();}catch(e){}
+  G.day=1;G.hp=100;G.st=100;G.moral=70;G.done=0;G.curses=0;G.fish=0;G.bag=[];G.queue=[];G.last=null;G.quest=newQuest();G.noFishNext=false;G.drillAt=0;
+  showHud();startDay(1);
+};
+window.__continue=()=>{
+  if(G.state!=='title')return;const o=readSave();if(!o)return;
+  try{initAudio();}catch(e){}showHud();applySave(o);
+  if(o.dayend)startDay(o.day+1);else radio('Kaptan','Kaldığın yerden devam ediyorsun, Dördüncü. Kimse seni özlemedi.');
+};
+const CHANGELOG=[
+ ['v0.7 · Mürettebat, hava ve kayıt',['Kayıt sistemi: oyun otomatik kaydedilir, "DEVAM ET" ile kaldığın yerden sürer.','Yeni mürettebat: Birinci Zabit, Başmühendis ve güverte tayfası; her birinin konuşma tarzı, seçenekli diyaloğu ve kendine ait sinir bozucu işi var.','Aşçı sabotajı: 3 gizli yiyecek bul, ocağı değiştir, balıksız bir öğün kazan. Her 5. gün de menüde balık yok.','Hava durumu: bulutlu, sisli ve fırtınalı günler; yağmur, şimşek, büyük dalgalar, daha kötü sis.','Acil durumlar: yangın tatbikatı, adam denize düştü tatbikatı, fırtınada ambar bağlama, sis düdüğü, gece gözcülüğü (radar).','Karakter animasyonları: göz kırpma, esneme, iç çekme, gerinme, göz ovma, yerde oturma, balık yerken yüz buruşturma.','Yatakta telefona bakma sahnesi (referans çizime göre).','Mobilde yakınlaştırma kapatıldı.']],
+ ['v0.6 · Joystick ve performans',['Kayan joystick: parmağını nereye koyarsan orada açılır; takılma sorunu giderildi.','Mini oyundan sonra tuşların basılı kalma hatası düzeltildi.','Işık havuzu, otomatik çözünürlük ve donmuş statik nesnelerle FPS iyileştirmesi; görüntü kalitesi korundu.','Mobil arayüz küçültüldü.']],
+ ['v0.5 · Mobilde açılma',['Tek dosya, kütüphane gömülü; internetsiz de açılır.','Yükleme yüzdesi ve tanı mesajları eklendi.','GitHub Pages ile yayına alındı.']],
+ ['v0.4 · Sert dil',['Karakterin küfürleri sertleştirildi, her göreve özel yeni küfür havuzları geldi.']],
+ ['v0.3 · Yemekhane ve balık',['Yemekhane ve mutfak eklendi (menü tahtası, asılı balıklar, balık kasaları).','Aşçı ve kaptan karakterleri; kahvaltı, öğle ve akşam yemekleri hep balık.','Kılçıklı yemek mini oyunu, yenen balık sayacı, 3 yeni görev.','Karakterin yüzü Pepe tarzına yaklaştırıldı, portre eklendi.']],
+ ['v0.2 · İlk dokunmatik kontrol',['Mobil joystick, E ve KOŞ düğmeleri, ekrana dokunmalı mini oyunlar.']],
+ ['v0.1 · İlk vardiya',['Kuru yük gemisi M/V ÇİLE, kamara, koridor, ofis, köprüüstü, güverte.','06:00-24:00 gün döngüsü: görev, kamaraya dönüş, dinlenme, yeni görev.','Can, derman ve moral çubukları; temizlik, evrak, pas, dümen ve palamar mini oyunları.','Görev sırasında küfür baloncukları, gün sonu özeti.']]
+];
+function buildChangelog(){$('clBody').innerHTML=CHANGELOG.map(([t,l])=>`<h3>${t}</h3><ul>${l.map(x=>`<li>${x}</li>`).join('')}</ul>`).join('');}
+function refreshTitle(){
+  buildChangelog();$('logBtn').onclick=()=>$('changelog').classList.remove('hidden');$('clClose').onclick=()=>$('changelog').classList.add('hidden');
+  const o=readSave();if(o){$('contBtn').classList.remove('hidden');$('contBtn').textContent='DEVAM ET · GÜN '+(o.dayend?o.day+1:o.day);$('startBtn').textContent='YENİ OYUN';$('startBtn').style.background='#394038';$('startBtn').style.color='#e9e4d2';}
+}
+
 $('deBtn').onclick=()=>startDay(G.day+1);
 $('deadBtn').onclick=()=>{G.hp=60;G.st=55;G.moral=Math.max(G.moral,35);startDay(G.day);};
 
@@ -1032,9 +1269,10 @@ const camPos=new THREE.Vector3(),camTgt=new THREE.Vector3(),wp=new THREE.Vector3
 let camDist=17;
 
 function gameUpdate(dt){
+  if(G.dlg)return;
   G.min+=dt*TIME_SCALE;
   if(G.min>=1440){endDay();return;}
-  checkEvents(dt);
+  checkEvents(dt);updateWeather(dt);G.saveT-=dt;if(G.saveT<=0){G.saveT=6;saveGame();}
   G.teaCD=Math.max(0,G.teaCD-dt);
   let moving=false,running=false;
   if(MG.active){updateMini(dt);}
@@ -1046,12 +1284,13 @@ function gameUpdate(dt){
     if(joy.active&&Math.hypot(joy.x,joy.y)>.18){mx_=joy.x;mz=joy.y;}
     if(mx_||mz){const l=Math.hypot(mx_,mz);mx_/=l;mz/=l;moving=true;
       running=isRun()&&G.st>4;
-      let sp=running?6.2:3.3;if(G.st<15)sp*=.72;if(G.moral<15)sp*=.9;
+      let sp=running?6.2:3.3;if(G.st<15)sp*=.72;if(G.moral<15)sp*=.9;if(!inInterior())sp*=1-.14*wx.storm;
       tryMove(mx_*sp*dt,mz*sp*dt);
       yaw+=angDiff(yaw,Math.atan2(mx_,mz))*Math.min(1,dt*12);
       if(running)G.st=Math.max(0,G.st-7*dt);
     }
     if(!running)G.st=Math.min(100,G.st+.12*dt);
+    if(!inInterior()&&wx.storm>.5)G.st=Math.max(0,G.st-.5*wx.storm*dt);
     if(inCabin()){G.st=Math.min(100,G.st+1.4*dt);G.hp=Math.min(100,G.hp+.2*dt);G.moral=Math.min(100,G.moral+.15*dt);}
   }
   walkPh+=dt*(running?13:8.5)*(moving?1:0);
@@ -1065,71 +1304,107 @@ function gameUpdate(dt){
   // phases
   if(G.phase==='rest'){G.callT-=dt;if(G.callT<=0&&!MG.active)callTask();}
   else if(G.phase==='return'&&inCabin()&&!G.lying)beginRest();
-  else if(G.phase==='toTask'){G.nagT-=dt;if(G.nagT<=0){G.nagT=28;G.moral=Math.max(0,G.moral-3);radio(G.task.from,'Dördüncü, neredesin?! O iş kendi kendine yapılmaz!');}}
+  else if(G.phase==='toTask'){
+    if(G.task&&G.task.emergency){G.emerT-=dt;if(G.emerT<=0){G.emerT=0;G.fail++;G.moral=Math.max(0,G.moral-8);radio('Kaptan','Çok yavaşsın Dördüncü! Tatbikat başarısız, not alıyorum.');say(pick(SAY.fail),3);G.phase='return';setTaskPanel('Kamaraya dön','Tatbikat kaçtı. Kamarana dön.','📍 Kamara');}}
+    else{G.nagT-=dt;if(G.nagT<=0){G.nagT=28;G.moral=Math.max(0,G.moral-3);radio(G.task.from,'Dördüncü, neredesin?! O iş kendi kendine yapılmaz!');}}
+  }
 }
 
 let portT=0;
 function updateHUD(){
   const h=Math.floor(G.min/60),m=Math.floor(G.min%60);
   $('clockT').textContent=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
-  $('dayT').textContent=`GÜN ${G.day} · VARDİYA 06:00 → 24:00`;
+  $('dayT').textContent=`GÜN ${G.day} · HAVA: ${WXNAME[wx.type]} · 06:00 → 24:00`;
   $('shiftF').style.width=((G.min-360)/1080*100)+'%';
   $('hpF').style.width=G.hp+'%';$('stF').style.width=G.st+'%';$('moF').style.width=G.moral+'%';
   $('hpV').textContent=Math.round(G.hp);$('stV').textContent=Math.round(G.st);$('moV').textContent=Math.round(G.moral);
   $('sDone').textContent=G.done;$('sCurse').textContent=G.curses;$('sFish').textContent=G.fish;
-  $('taskM').textContent=(G.meal&&!G.ate[G.meal.id])?`🍽 ${G.meal.name}: ${G.dish} · yemekhane`:'';
+  {const ls=[];
+    if(G.task&&G.task.emergency&&G.phase==='toTask')ls.push(`⏱ ACİL: ${Math.ceil(G.emerT)} sn`);
+    if(G.meal&&!G.ate[G.meal.id])ls.push(`🍽 ${G.meal.name}: ${G.dish} · yemekhane`);
+    if(G.quest.step===1)ls.push(`🥫 Sabotaj: ${Object.keys(G.quest.items).length}/3 gizli yiyecek`);
+    else if(G.quest.step===2)ls.push('🥫 Sabotaj: mutfakta ocağa git');
+    $('taskM').textContent=ls.join('\n');}
   portT-=.125;if(portT<=0){portT=.5;drawPortrait();}
-  {const ht=!IS_TOUCH||MG.active||G.state!=='play';$('touch').classList.toggle('hidden',ht);if(ht&&(joy.active||runHeld))resetJoy();}
+  {const ht=!IS_TOUCH||MG.active||G.state!=='play'||!!G.dlg;$('touch').classList.toggle('hidden',ht);if(ht&&(joy.active||runHeld))resetJoy();}
   $('btnE').classList.toggle('on',!!currentInteract());$('btnRun').classList.toggle('on',runHeld);
   const it=currentInteract(),p=$('prompt');if(it){p.textContent=it.text;p.classList.add('show');}else p.classList.remove('show');
   if(radioT>0){radioT-=.125;if(radioT<=0)$('radio').classList.remove('show');}
 }
 
+let idleT=0,sitK=0,emote=null,emoteCD=rand(8,14),blinkT=rand(2,4),blinkK=0;
+function startEmote(type){emote={type:type,t:0,dur:{yawn:2.8,stretch:2.6,sigh:2.2,rub:2}[type]||2};}
+function applyFace(lidK,mx,my,mp){const lo=.128-(lidK-.8)*.04;P.lids.forEach(l=>{l.scale.y=lidK;l.position.y=lo;});P.lip.scale.set(mx,my,.075);P.lip.position.y=mp;}
 function animatePlayer(dt,t){
   const mode=MG.active?(MG.task.anim||'idle'):G.lying?'lie':'walk';
   const act=Math.max(0,P.act||0);P.act=act-dt;
   const tired=1-clamp(G.st/100,0,1);
-  // reset
-  P.arms.forEach(a=>{a.rotation.x=0;});P.legs.forEach(l=>l.rotation.x=0);
+  const mv=moving_();
+  P.arms.forEach(a=>{a.rotation.x=0;a.userData.elbow.rotation.x=0;});P.legs.forEach(l=>l.rotation.x=0);
   P.torso.rotation.set(.1+tired*.18,0,0);P.head.rotation.set(.14+tired*.14,0,0);
+  P.body.position.y=0;
   player.position.copy(pos);
+  blinkT-=dt;if(blinkT<=0){blinkT=rand(2.5,5.5);blinkK=1;}blinkK=Math.max(0,blinkK-dt*7);
+  let lidK=.8+tired*.12+blinkK*.7,mouthX=.17,mouthY=.055,mouthPos=-.185;
+  P.props.phone.visible=(mode==='lie');
   if(mode==='lie'){
     player.rotation.set(-Math.PI/2,Math.PI/2,0);player.position.set(-19.85,1.32,-6);P.blob.visible=false;
-    P.head.rotation.set(-.1,0,0);P.torso.rotation.x=0;P.arms[0].rotation.x=.1;P.arms[1].rotation.x=.1;
-    const br=Math.sin(t*1.6)*.02;P.torso.scale.set(1+br,1+br,1+br);
-    P.lip.scale.y=.04+Math.max(0,Math.sin(t*1.6))*.02;
-    return;
+    const sc=Math.sin(t*1.7)*.05,br=Math.sin(t*1.6)*.02;
+    P.torso.rotation.x=-.3;P.torso.scale.set(1+br,1+br,1+br);
+    P.head.rotation.set(.5+sc*.4,0,0);
+    P.arms[0].rotation.set(-1.05,0,-.15);P.arms[0].userData.elbow.rotation.x=-1.55+sc;
+    P.arms[1].rotation.set(.05,0,.05);P.arms[1].userData.elbow.rotation.x=-.25;
+    applyFace(.92+blinkK*.5,.15,.05,mouthPos);return;
   }
   P.torso.scale.set(1,1,1);P.blob.visible=true;
   player.rotation.set(0,yaw,0);
   let bob=0;
   if(mode==='walk'){
     const sw=Math.sin(walkPh);const run=walkPh>0&&isRun()&&G.st>4;
-    const amp=run?.9:.55;if(moving_()){P.legs[0].rotation.x=sw*amp;P.legs[1].rotation.x=-sw*amp;P.arms[0].rotation.x=-sw*amp*.7;P.arms[1].rotation.x=sw*amp*.7;bob=Math.abs(Math.sin(walkPh))*.05;P.torso.rotation.x+=run?.12:0;}
+    const amp=run?.9:.55;if(mv){P.legs[0].rotation.x=sw*amp;P.legs[1].rotation.x=-sw*amp;P.arms[0].rotation.x=-sw*amp*.7;P.arms[1].rotation.x=sw*amp*.7;P.arms.forEach(a=>a.userData.elbow.rotation.x=-.25-Math.abs(sw)*.2);bob=Math.abs(Math.sin(walkPh))*.05;P.torso.rotation.x+=run?.12:0;}
     else{P.arms[0].rotation.x=Math.sin(t*1.3)*.03;P.arms[1].rotation.x=Math.sin(t*1.3+1)*.03;P.torso.rotation.x+=Math.sin(t*1.1)*.015;}
-  }else if(mode==='scrub'){
+    // bekleme hareketleri: esneme, iç çekme, göz ovma, oturma
+    if(!mv){idleT+=dt;emoteCD-=dt;
+      if(!emote&&emoteCD<=0&&G.state==='play'&&!G.dlg){emoteCD=rand(9,18);startEmote(pick(tired>.5?['sigh','yawn','rub','sigh']:['yawn','stretch','sigh']));}
+    }else{idleT=0;emote=null;}
+    if(emote){emote.t+=dt;if(emote.t>=emote.dur)emote=null;}
+    const sitT=(!mv&&!emote&&idleT>6&&inCabin())?1:0;sitK=lerp(sitK,sitT,Math.min(1,dt*4));
+    if(emote){const k=Math.sin(Math.PI*emote.t/emote.dur),A0=P.arms[0],E0=A0.userData.elbow;
+      if(emote.type==='yawn'){P.head.rotation.x=lerp(P.head.rotation.x,-.4,k);A0.rotation.x=-1.5*k;E0.rotation.x=-1.9*k;mouthY=lerp(.055,.16,k);mouthPos=lerp(-.185,-.245,k);mouthX=lerp(.17,.13,k);lidK+=k*.3;P.torso.rotation.x-=k*.1;}
+      else if(emote.type==='stretch'){P.arms.forEach(a=>a.rotation.x=-2.9*k);P.torso.rotation.x-=k*.22;P.head.rotation.x-=k*.35;lidK+=k*.25;mouthY=.09;}
+      else if(emote.type==='sigh'){P.torso.rotation.x+=k*.28;P.head.rotation.x+=k*.2;P.arms.forEach(a=>a.rotation.x+=k*.25);mouthX=.12;mouthY=.075;lidK+=k*.3;}
+      else if(emote.type==='rub'){A0.rotation.x=-1.5*k;E0.rotation.x=-2.1*k;P.head.rotation.x+=k*.15;lidK=lerp(lidK,1.25,k);}
+    }
+    if(sitK>.01){P.body.position.y=-.75*sitK;P.legs.forEach(l=>l.rotation.x=-1.45*sitK);P.arms.forEach(a=>{a.rotation.x+=-.45*sitK;});P.torso.rotation.x+=.14*sitK;P.head.rotation.x+=.12*sitK;lidK+=.1*sitK;}
+  }else{sitK=lerp(sitK,0,Math.min(1,dt*6));emote=null;idleT=0;
+   if(mode==='scrub'){
     const s=Math.sin(t*(act>0?14:3));P.torso.rotation.x=.3;P.arms.forEach(a=>a.rotation.x=-.9+s*.25);P.torso.rotation.y=s*.25;bob=Math.abs(s)*.02;
-  }else if(mode==='stamp'){
+   }else if(mode==='stamp'){
     P.arms[0].rotation.x=-1.1+(act>0?Math.sin(act*20)*.6:0);P.arms[1].rotation.x=-.8;P.torso.rotation.x=.28;
-  }else if(mode==='write'){
+   }else if(mode==='write'){
     P.arms[0].rotation.x=-1.0+Math.sin(t*(act>0?18:2))*.12;P.arms[1].rotation.x=-.8;P.torso.rotation.x=.25;P.head.rotation.x=.4;
-  }else if(mode==='hammer'){
+   }else if(mode==='hammer'){
     const sw=act>0?Math.sin(act*14)*.9:0;P.arms[0].rotation.x=-1.4-sw*.8;P.arms[1].rotation.x=-.5;P.torso.rotation.x=.25;
-  }else if(mode==='eat'){
-    P.arms[0].rotation.x=-1.9+(act>0?Math.sin(act*18)*.3:0);P.arms[1].rotation.x=-.5;P.torso.rotation.x=.2;P.head.rotation.x=.3+(MG.d.chew>0?Math.sin(t*22)*.08:0);
-  }else if(mode==='helm'){
+   }else if(mode==='eat'){
+    const ch=MG.d&&MG.d.chew>0;
+    P.arms[0].rotation.x=-1.0+(act>0?Math.sin(act*18)*.25:0);P.arms[0].userData.elbow.rotation.x=-1.6;P.arms[1].rotation.x=-.5;P.torso.rotation.x=.2;P.head.rotation.x=.3+(ch?Math.sin(t*22)*.08:0);
+    lidK=ch?.98:.88;if(ch){mouthX=.12;mouthY=.09+Math.sin(t*22)*.02;}
+    if(MG.flash>0){lidK=1.35;mouthX=.1;mouthY=.04;P.head.rotation.x=.45;}
+    if(MG.task&&MG.task.fishy===false&&!ch){lidK=.78;mouthX=.2;mouthY=.06;}
+   }else if(mode==='helm'){
     P.arms.forEach(a=>a.rotation.x=-1.15);P.torso.rotation.x=.08;P.torso.rotation.y=Math.sin(t*.8)*.04+(MINI.helm&&MG.d.a?MG.d.a*.004:0);
+   }
   }
-  P.body.position.y=bob;
-  P.lip.scale.y=.04;
+  P.body.position.y+=bob;
+  applyFace(lidK,mouthX,mouthY,mouthPos);
 }
 function moving_(){return !MG.active&&!G.lying&&((joy.active&&Math.hypot(joy.x,joy.y)>.18)||keys.has('KeyW')||keys.has('KeyA')||keys.has('KeyS')||keys.has('KeyD')||keys.has('ArrowUp')||keys.has('ArrowDown')||keys.has('ArrowLeft')||keys.has('ArrowRight'));}
 
 function worldUpdate(dt,t){
   animSea(t);npcUpdate(dt,t);updateLamps(dt);
   swell=Math.max(0,swell-dt*.3);
-  ship.rotation.x=Math.sin(t*.55)*.012+swell*Math.sin(t*1.7)*.03;
-  ship.rotation.z=Math.sin(t*.43+1)*.007+swell*Math.sin(t*1.1)*.012;
+  ship.rotation.x=Math.sin(t*.55)*.012*(1+2.2*wx.storm)+swell*Math.sin(t*1.7)*.03;
+  ship.rotation.z=Math.sin(t*.43+1)*.007*(1+2*wx.storm)+swell*Math.sin(t*1.1)*.012;
   ship.position.y=Math.sin(t*.7)*.07;
   // outside view shifts with roll
   T.view.offset.y=.25+clamp(ship.rotation.x*5+ship.rotation.z*3,-.2,.2);
@@ -1144,10 +1419,10 @@ function worldUpdate(dt,t){
   // gulls
   gulls.forEach(g=>{const u=g.userData;u.a+=dt*u.s;g.position.set(20+Math.cos(u.a)*u.r,u.h+Math.sin(t+u.a*3),-2+Math.sin(u.a)*u.r*.5);g.rotation.y=-u.a+Math.PI;const f=Math.sin(t*7+u.a)*.5;u.p1.rotation.z=f;u.p2.rotation.z=-f;});
   // audio balance
-  if(AC&&engG){const inside=inInterior();engG.gain.value=lerp(engG.gain.value,inside?.18:.08,dt*2);waveG.gain.value=lerp(waveG.gain.value,inside?.1:.28,dt*2);}
+  if(AC&&engG){const inside=inInterior();engG.gain.value=lerp(engG.gain.value,inside?.18:.08,dt*2);waveG.gain.value=lerp(waveG.gain.value,(inside?.1:.28)*(1+wx.storm*1.6),dt*2);}
   // sky + camera
   const h=G.min/60;player.getWorldPosition(wp);
-  sunMul=lerp(sunMul,1,Math.min(1,dt*3));updateSky(h,wp);
+  sunMul=lerp(sunMul,1,Math.min(1,dt*3));updateSky(h,wp);updateRain(dt,wp);
   const inside=inInterior();camDist=lerp(camDist,zoomBase*(inside?.82:1),dt*2.5);
   camTgt.lerp(wp,Math.min(1,dt*5));
   const sh=MG.shake>0?MG.shake*.2:0;
@@ -1168,8 +1443,23 @@ function updateLamps(dt){
   POOL.forEach(p=>{p.k=Math.min(1,p.k+dt*3);p.l.intensity=p.def?p.def.int*p.k:0;});
 }
 // statik nesnelerin matrisini dondur (CPU tasarrufu)
-{const DYN=new Set([player,beacon,arrow,helmWheel,NPC.cook.head,NPC.captain.head,NPC.cook.g,NPC.captain.g].concat(POOL.map(p=>p.l)));
+{const DYN=new Set([player,beacon,arrow,helmWheel].concat(Object.values(NPC).reduce((a,n)=>a.concat([n.head,n.g]),[])).concat(POOL.map(p=>p.l)));
  ship.traverse(o=>{if(o===ship)return;let p=o;while(p&&p!==ship){if(DYN.has(p))return;p=p.parent;}o.updateMatrix();o.matrixAutoUpdate=false;});}
+// yağmur
+const RAIN_N=IS_TOUCH?320:700,rainGeo=new THREE.BufferGeometry(),rainPos=new Float32Array(RAIN_N*6),rainV=new Float32Array(RAIN_N),rdrop=[];
+for(let i=0;i<RAIN_N;i++){rainV[i]=rand(26,38);rdrop.push({x:rand(-24,24),y:rand(0,20),z:rand(-24,24)});}
+rainGeo.setAttribute('position',new THREE.BufferAttribute(rainPos,3));
+const rainMat=new THREE.LineBasicMaterial({color:0xaec6e0,transparent:true,opacity:0,depthWrite:false});
+const rain=new THREE.LineSegments(rainGeo,rainMat);rain.frustumCulled=false;rain.visible=false;scene.add(rain);
+function updateRain(dt,c){
+  rainMat.opacity=wx.rain*.5;rain.visible=wx.rain>.03;if(!rain.visible)return;
+  for(let i=0;i<RAIN_N;i++){const d=rdrop[i];d.y-=rainV[i]*dt;d.x-=6*dt;
+    if(d.y<0){d.y=20+rand(0,4);d.x=rand(-24,24);d.z=rand(-24,24);}
+    let px=c.x+d.x,pz=c.z+d.z;
+    if(px>-41.5&&px<3.5&&pz>-7.5&&pz<3.1&&d.y<3.5){d.y=20+rand(0,4);d.x=rand(-24,24);d.z=rand(-24,24);px=c.x+d.x;pz=c.z+d.z;}
+    const o=i*6;rainPos[o]=px;rainPos[o+1]=d.y;rainPos[o+2]=pz;rainPos[o+3]=px+.25;rainPos[o+4]=d.y+.9;rainPos[o+5]=pz;}
+  rainGeo.attributes.position.needsUpdate=true;
+}
 let hudT=0,fpsT=0,fpsN=0,fpsWarm=3;
 let prev=performance.now();
 camTgt.set(-20,0,-4);camera.position.set(-20,13,8);
@@ -1188,8 +1478,8 @@ function loop(now){
   renderer.render(scene,camera);
 }
 requestAnimationFrame(loop);
-window.G=G;window.__dbg={callTask,finishTask,beginTask,pos,TASKS,MG};
-document.getElementById('bootbar').style.width='100%';$('bootmsg').textContent='✓ Oyun hazır (%100)';
+window.G=G;window.__dbg={P,THREE,callTask,finishTask,beginTask,pos,TASKS,MG,wx,NPC,setZoom:v=>{zoomBase=v;},openDlg,startEmote,saveGame,collectItem,QITEMS,updateMenu,startDay};
+refreshTitle();document.getElementById('bootbar').style.width='100%';$('bootmsg').textContent='✓ Oyun hazır (%100)';
 };
 </script>
 <script>(function(){
